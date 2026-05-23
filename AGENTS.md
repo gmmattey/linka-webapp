@@ -39,6 +39,24 @@ Antes de criar script, leia `scripts/README.md`.
 4. Atualizar docs quando contratos, fluxos ou estrutura mudarem.
 5. Rodar validacoes aplicaveis.
 
+## Fluxo GitHub/Slack
+
+Quando o usuario pedir tratativa continua de issues do GitHub:
+
+1. Buscar issues abertas do repositorio e ordenar por prioridade declarada (`P0`, `P1`, `P2`) e, em empate, pela ordem da issue.
+2. Tratar uma issue por vez.
+3. Criar branch dedicada com prefixo `codex/`.
+4. Implementar o menor conjunto de mudancas necessario, incluindo docs e testes quando aplicavel.
+5. Rodar a validacao minima (`npm run lint`, `npm test`, `npm run build`) e qualquer verificacao de browser/PWA relevante.
+6. Criar commit objetivo na branch.
+7. Enviar a branch para o GitHub e abrir PR para `main` vinculando a issue.
+8. Se a validacao estiver ok e a branch estiver alinhada com `main`, aplicar o commit na `main` por fast-forward/push ou merge equivalente autorizado pelo usuario.
+9. Confirmar que o PR/issue ficou concluido no GitHub.
+10. Informar no Slack, canal `#linka-webapp`, com issue, PR, commit e validacoes executadas.
+11. Repetir o fluxo para a proxima issue aberta por prioridade.
+
+Se algum passo nao puder ser executado, reportar explicitamente o bloqueio e nao fingir conclusao.
+
 ## Validacao Minima
 
 ```bash
