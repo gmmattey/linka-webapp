@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-O Linka WebApp mede a qualidade percebida da conexao do usuario e traduz o resultado em linguagem pratica.
+O linka WebApp mede a qualidade percebida da conexao do usuario e traduz o resultado em linguagem pratica.
 
 ## Fluxo Principal
 

@@ -97,13 +97,13 @@ export const copyDictionary: Record<string, string> = {
   'dataWarning.mobile.cancel': 'Cancelar',
 
   // Privacidade — W1-09
-  'privacy.title': 'Dados usados pelo Linka',
+  'privacy.title': 'Dados usados pelo linka',
   'privacy.collects.header': 'O que medimos',
   'privacy.collects.1': 'Velocidade de download e upload da sua internet',
   'privacy.collects.2': 'Tempo de resposta da conexão (latência)',
   'privacy.collects.3': 'Tipo de rede em uso (Wi-Fi ou dados móveis)',
   'privacy.collects.4': 'Qualidade do servidor de nomes (DNS)',
-  'privacy.not.header': 'O que o Linka NÃO faz',
+  'privacy.not.header': 'O que o linka NÃO faz',
   'privacy.not.1': 'Não acessa suas mensagens, fotos ou arquivos',
   'privacy.not.2': 'Não vende nem compartilha nenhum dado com terceiros',
   'privacy.not.3': 'Não cria perfil seu nem rastreia seu uso fora do app',

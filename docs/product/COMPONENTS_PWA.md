@@ -1,4 +1,4 @@
-# Componentes PWA — Linka SpeedTest
+# Componentes PWA — linka SpeedTest
 
 **Versão:** v1.4.0 | **Localização:** `src/components/`
 

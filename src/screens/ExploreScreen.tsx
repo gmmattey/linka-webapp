@@ -44,7 +44,7 @@ const CHANGELOG = [
     version: 'v1.0.0',
     date: 'março/2026',
     items: [
-      'Lançamento do Linka PWA',
+      'Lançamento do linka PWA',
       'Speed test com múltiplos provedores (Cloudflare)',
       'Diagnóstico básico de rede',
       'Histórico local de testes',
@@ -249,7 +249,7 @@ export function ExploreScreen({
             />
             <Md3Row
               icon={<Ic name="info" />} iconBg={ICON_BG_ACCENT}
-              title="Dados usados pelo Linka"
+              title="Dados usados pelo linka"
               subtitle="Velocidade, DNS, sinal — o que medimos"
               showChevron onClick={() => setShowDados(true)}
             />
@@ -306,7 +306,7 @@ export function ExploreScreen({
             />
             <Md3Row
               icon={<Ic name="info" />} iconBg={ICON_BG_ACCENT}
-              title="Sobre o Linka"
+              title="Sobre o linka"
               subtitle="v1.1.0 · Web PWA"
               showChevron onClick={() => setShowSobre(true)}
             />
@@ -431,7 +431,7 @@ export function ExploreScreen({
             ) : notifPerm === 'granted' ? (
               <div className="lk-settings-fallback lk-settings-fallback--inline">
                 <p className="lk-settings-fallback__desc">
-                  Notificações estão <strong>ativadas</strong>. O Linka pode enviar alertas quando sua conexão estiver abaixo do limite configurado.
+                  Notificações estão <strong>ativadas</strong>. O linka pode enviar alertas quando sua conexão estiver abaixo do limite configurado.
                 </p>
               </div>
             ) : (
@@ -451,7 +451,7 @@ export function ExploreScreen({
         <SettingsSheet title="Alertas de qualidade" onClose={() => setShowAlertas(false)}>
           <div className="lk-settings-form">
             <p className="lk-settings-desc">
-              Defina um limite mínimo de download. Quando sua conexão ficar abaixo desse valor, o Linka pode alertar você.
+              Defina um limite mínimo de download. Quando sua conexão ficar abaixo desse valor, o linka pode alertar você.
             </p>
             <div className="lk-settings-toggle-row">
               <span>Ativar alertas</span>
@@ -501,7 +501,7 @@ export function ExploreScreen({
               </div>
             </div>
             <p className="lk-settings-desc">
-              A análise avançada está sempre ativa no Linka web. Todos os testes medem jitter, perda de pacotes e bufferbloat automaticamente.
+              A análise avançada está sempre ativa no linka web. Todos os testes medem jitter, perda de pacotes e bufferbloat automaticamente.
             </p>
           </div>
         </SettingsSheet>
@@ -561,7 +561,7 @@ export function ExploreScreen({
 
       {/* ── Dados usados Sheet ────────────────────────────────────────── */}
       {showDados && (
-        <SettingsSheet title="Dados usados pelo Linka" onClose={() => setShowDados(false)}>
+        <SettingsSheet title="Dados usados pelo linka" onClose={() => setShowDados(false)}>
           <PrivacyContent onClose={() => setShowDados(false)} />
         </SettingsSheet>
       )}
@@ -631,7 +631,7 @@ export function ExploreScreen({
           <div className="lk-settings-about">
             <div className="lk-settings-about-row"><span>Versão</span><span>v1.1.0</span></div>
             <div className="lk-settings-about-row"><span>Plataforma</span><span>Web PWA</span></div>
-            <div className="lk-settings-about-row"><span>Motor</span><span>Cloudflare Speedtest</span></div>
+            <div className="lk-settings-about-row"><span>Motor</span><span>Cloudflare Speed Test</span></div>
             <div className="lk-settings-about-row"><span>Integridade</span><span className="lk-settings-status-ok">✓ OK</span></div>
           </div>
           <div className="lk-settings-diag-note">
@@ -668,15 +668,15 @@ export function ExploreScreen({
 
       {/* ── Sobre Sheet ───────────────────────────────────────────────── */}
       {showSobre && (
-        <SettingsSheet title="Sobre o Linka" onClose={() => setShowSobre(false)}>
+        <SettingsSheet title="Sobre o linka" onClose={() => setShowSobre(false)}>
           <div className="lk-settings-about">
             <div className="lk-settings-about-row"><span>Versão</span><span>v1.1.0</span></div>
             <div className="lk-settings-about-row"><span>Plataforma</span><span>Web PWA · Kotlin Android</span></div>
             <div className="lk-settings-about-row"><span>Central de medição</span><span>Cloudflare</span></div>
-            <div className="lk-settings-about-row"><span>Desenvolvido por</span><span>Equipe LINKA</span></div>
+            <div className="lk-settings-about-row"><span>Desenvolvido por</span><span>Equipe linka</span></div>
             <div className="lk-settings-about-row"><span>Suporte</span><span>suporte@linka.app</span></div>
             <p className="lk-settings-about-desc">
-              O Linka é uma ferramenta de diagnóstico de rede focada em simplicidade e precisão.
+              O linka é uma ferramenta de diagnóstico de rede focada em simplicidade e precisão.
             </p>
           </div>
         </SettingsSheet>

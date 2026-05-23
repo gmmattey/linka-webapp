@@ -55,7 +55,7 @@ export async function exportResultPdf(result: SpeedTestResult, serverName: strin
       <div style="font-family:'Geist',sans-serif;font-weight:600;font-size:15px;margin-bottom:8px;">O que isso significa?</div>
       ${interpreted.copyKeys.diagnosisKeys.map((k) => resolveCopy(k)).map((p) => `<p style="margin:0 0 8px 0;line-height:1.5;">${p}</p>`).join('')}
     </div>
-    <div style="margin-top:32px;color:#9CA3AF;font-size:10px;">Gerado por LINKA SpeedTest</div>
+    <div style="margin-top:32px;color:#9CA3AF;font-size:10px;">Gerado por linka SpeedTest</div>
     <div style="margin-top:6px;color:#9CA3AF;font-size:9px;">Medições feitas via Cloudflare Speed Test. Não substitui aferição oficial via EAQ Anatel — serve como prova circunstancial em reclamações.</div>
   `;
 
@@ -133,7 +133,7 @@ export async function exportHistoryPdf(items: TestRecord[]) {
       </thead>
       <tbody style="font-family:'Geist',sans-serif;">${rows}</tbody>
     </table>
-    <div style="margin-top:32px;color:#9CA3AF;font-size:10px;">Gerado por LINKA SpeedTest</div>
+    <div style="margin-top:32px;color:#9CA3AF;font-size:10px;">Gerado por linka SpeedTest</div>
     <div style="margin-top:6px;color:#9CA3AF;font-size:9px;">Medições feitas via Cloudflare Speed Test. Não substitui aferição oficial via EAQ Anatel — serve como prova circunstancial em reclamações.</div>
   `;
 

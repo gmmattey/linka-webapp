@@ -1091,7 +1091,7 @@ export function ResultScreen({
         })()}
 
         {/* Contexto Wi-Fi via Atalho iOS (2026-05): exibe quando o teste
-            foi precedido pelo Atalho LINKA WiFi Context. Fica entre o
+            foi precedido pelo Atalho linka WiFi Context. Fica entre o
             bloco de diagnóstico e a seção "Mais detalhes". */}
         {result.wifiContext && (
           <WifiContextCard ctx={result.wifiContext} />

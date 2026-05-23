@@ -1,4 +1,4 @@
-# Linka WebApp
+# linka WebApp
 
 PWA standalone para medir velocidade e qualidade de conexao de internet com diagnostico claro para usuario final.
 

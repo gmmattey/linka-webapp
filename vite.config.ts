@@ -50,9 +50,9 @@ export default defineConfig({
         'touch-icon/ios/AppIcon-83.5@2x~ipad.png',
       ],
       manifest: {
-        name: 'Linka Speedtest',
-        short_name: 'Linka',
-        description: 'Meça a qualidade real da sua internet com clareza.',
+        name: 'linka SpeedTest',
+        short_name: 'linka',
+        description: 'Entenda a qualidade real da sua internet com clareza.',
         // theme_color / background_color alinhados com o `--bg` do tema dark
         // (#000000) e com as `<meta name="theme-color">` em `index.html`.
         // Antes: '#6C2BFF' (accent roxo) — causava flash roxo no splash do
