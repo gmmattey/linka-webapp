@@ -2,7 +2,7 @@
 
 ## Mapa
 
-- `HomeScreen`: entrada, ultimo resultado e atalhos.
+- `HomeScreen`: entrada, proposta de valor, consumo por modo, ultimo resultado e atalhos.
 - `SpeedTestScreen`: preparacao e inicio do teste.
 - `RunningScreen`: progresso da medicao.
 - `ResultScreen`: resultado, diagnostico e detalhes.

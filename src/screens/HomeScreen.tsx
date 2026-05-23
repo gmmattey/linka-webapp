@@ -8,6 +8,7 @@ import { useScrollHeader } from '../hooks/useScrollHeader';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import { formatMbps, formatMs } from '../utils/format';
 import { loadHistory } from '../utils/history';
+import { resolveCopy } from '../core';
 import './HomeScreen.css';
 
 interface Props {
@@ -511,6 +512,27 @@ export function HomeScreen({
             </div>
           </div>
         )}
+
+        <section className="lk-home__intro card" aria-label="Resumo do teste">
+          <div className="lk-home__intro-copy">
+            <p className="lk-home__intro-title">Entenda sua internet antes de reclamar.</p>
+            <p className="lk-home__intro-body">
+              O linka mede velocidade, resposta e estabilidade para explicar se a conexão aguenta vídeos, chamadas, jogos e trabalho.
+            </p>
+          </div>
+          <div className="lk-home__data-list" aria-label="Consumo de dados por modo">
+            <div className="lk-home__data-row">
+              <span className="lk-home__data-label">{resolveCopy('dataConsumption.quick_test.label')}</span>
+              <span className="lk-home__data-value">{resolveCopy('dataConsumption.quick_test.usage')}</span>
+              <span className="lk-home__data-desc">{resolveCopy('dataConsumption.quick_test.purpose')}</span>
+            </div>
+            <div className="lk-home__data-row">
+              <span className="lk-home__data-label">{resolveCopy('dataConsumption.complete_test.label')}</span>
+              <span className="lk-home__data-value">{resolveCopy('dataConsumption.complete_test.usage')}</span>
+              <span className="lk-home__data-desc">{resolveCopy('dataConsumption.complete_test.purpose')}</span>
+            </div>
+          </div>
+        </section>
 
         {/* ── Medições card ────────────────────────────────── */}
         <section className="lk-home__medicoes card">
