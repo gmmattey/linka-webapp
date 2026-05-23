@@ -80,6 +80,9 @@ export function SpeedTestScreen({
 
         <p className="st-mode-desc">{MODE_DESC[mode]}</p>
 
+        {/* ── Contexto do teste ── */}
+        <TestContextCard device={device} server={server} />
+
         {/* ── Resultados (só aparecem após a primeira medição) ── */}
         {lastRecord && (
           <>
@@ -101,9 +104,6 @@ export function SpeedTestScreen({
 
         {/* ── Ferramentas ── */}
         <ExploreToolsRow onClick={() => setShowToolsSheet(true)} />
-
-        {/* ── Status de conexão ── */}
-        <StatusCard device={device} server={server} />
 
         <div className="st-bottom-spacer" />
       </div>
@@ -369,35 +369,68 @@ function ExploreToolsRow({ onClick }: { onClick: () => void }) {
   );
 }
 
-/* ── Card: Status de conexão ─────────────────────────────────────────────── */
+/* ── Card: contexto do teste ─────────────────────────────────────────────── */
 
-function StatusCard({ device, server }: { device: DeviceInfo | null; server: ServerInfo | null }) {
+function TestContextCard({ device, server }: { device: DeviceInfo | null; server: ServerInfo | null }) {
   const type = device?.connectionType ?? 'unknown';
-  const connected = device !== null;
+  const deviceLabel = device?.deviceType === 'mobile'
+    ? 'Celular'
+    : device?.deviceType === 'tablet'
+      ? 'Tablet'
+      : device?.deviceType === 'desktop'
+        ? 'Computador'
+        : 'Seu aparelho';
+  const networkLabel = type === 'wifi'
+    ? 'Wi-Fi'
+    : type === 'cable'
+      ? 'Cabo'
+      : type === 'mobile'
+        ? 'Dados móveis'
+        : 'Rede não identificada';
+  const networkDescription = type === 'unknown'
+    ? 'O navegador não informou se é Wi-Fi, cabo ou dados móveis.'
+    : 'Usaremos essa rede para medir download, upload e atraso.';
+  const serverLabel = server ? server.name : 'Servidor em preparação';
+  const serverDescription = server
+    ? 'Servidor externo usado como destino da medição.'
+    : 'Usaremos um servidor externo disponível no momento do teste.';
 
   return (
-    <div className="st-card st-card--status">
-      <div className="st-status-row">
-        <span className="st-status-icon" aria-hidden="true">
-          {type === 'wifi' ? <WifiIcon /> : type === 'cable' ? <EthernetIcon /> : type === 'mobile' ? <SignalIcon /> : <WifiOffIcon />}
-        </span>
-        <span className="st-status-label">
-          {type === 'wifi' ? 'Wi-Fi' : type === 'cable' ? 'Cabo' : type === 'mobile' ? 'Dados móveis' : 'Sem conexão'}
-        </span>
-        <span className={`st-status-value ${connected ? 'st-status-value--ok' : 'st-status-value--fail'}`}>
-          {connected ? 'Conectado' : 'Desconectado'}
-        </span>
+    <div className="st-card st-card--test-context">
+      <div className="st-card__header">
+        <span className="st-card__title">Como o teste será feito</span>
       </div>
-      {server && (
-        <>
-          <div className="st-divider" />
-          <div className="st-status-row">
-            <span className="st-status-icon" aria-hidden="true"><GlobeIcon /></span>
-            <span className="st-status-label">Servidor</span>
-            <span className="st-status-value">{server.colo && server.colo !== '—' ? `${server.name} · ${server.colo}` : server.name}</span>
+      <p className="st-card__body">Vamos medir do seu aparelho até um servidor externo.</p>
+
+      <div className="st-context-list">
+        <div className="st-context-row">
+          <span className="st-context-icon" aria-hidden="true"><DeviceIcon kind={device?.deviceType} /></span>
+          <div className="st-context-text">
+            <span className="st-context-label">Aparelho</span>
+            <span className="st-context-value">{deviceLabel}</span>
           </div>
-        </>
-      )}
+        </div>
+        <div className="st-divider" />
+        <div className="st-context-row">
+          <span className="st-context-icon" aria-hidden="true">
+            {type === 'wifi' ? <WifiIcon /> : type === 'cable' ? <EthernetIcon /> : type === 'mobile' ? <SignalIcon /> : <WifiOffIcon />}
+          </span>
+          <div className="st-context-text">
+            <span className="st-context-label">Rede atual</span>
+            <span className="st-context-value">{networkLabel}</span>
+            <span className="st-context-description">{networkDescription}</span>
+          </div>
+        </div>
+        <div className="st-divider" />
+        <div className="st-context-row">
+          <span className="st-context-icon" aria-hidden="true"><GlobeIcon /></span>
+          <div className="st-context-text">
+            <span className="st-context-label">Servidor externo</span>
+            <span className="st-context-value">{serverLabel}</span>
+            <span className="st-context-description">{serverDescription}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -552,6 +585,33 @@ function ChevronIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ color: 'var(--text-3)' }}>
       <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function DeviceIcon({ kind }: { kind?: DeviceInfo['deviceType'] }) {
+  if (kind === 'mobile') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="7" y="2" width="10" height="20" rx="2" stroke="currentColor" strokeWidth="1.7" />
+        <path d="M11 18h2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  if (kind === 'tablet') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" strokeWidth="1.7" />
+        <path d="M11 17h2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M8 20h8M12 16v4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   );
 }

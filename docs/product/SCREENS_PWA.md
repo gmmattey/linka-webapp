@@ -3,7 +3,7 @@
 ## Mapa
 
 - `HomeScreen`: entrada, proposta de valor, consumo por modo, ultimo resultado e atalhos.
-- `SpeedTestScreen`: preparacao e inicio do teste.
+- `SpeedTestScreen`: preparacao e inicio do teste, com o painel "Como o teste sera feito" explicando aparelho, rede atual e servidor externo em linguagem simples.
 - `RunningScreen`: progresso da medicao.
 - `ResultScreen`: resultado, diagnostico e detalhes.
 - `HistoryScreen`: historico local.
@@ -20,4 +20,5 @@
 
 - Telas devem funcionar em mobile e desktop.
 - Limitacoes do navegador devem ser explicitas.
+- Quando o navegador nao identificar o tipo de rede, a interface deve informar "Rede nao identificada" e nao deve assumir Wi-Fi, cabo, dados moveis ou desconexao.
 - Nenhuma tela deve depender de runtime nativo.

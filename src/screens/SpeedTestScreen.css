@@ -200,12 +200,6 @@
   border-color: color-mix(in srgb, var(--success, #34D399) 20%, transparent);
 }
 
-.st-card--status {
-  gap: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
 .st-card__header {
   display: flex;
   align-items: center;
@@ -392,33 +386,61 @@
   background: var(--surface-2, rgba(255,255,255,0.06));
 }
 
-/* ── Status card ── */
-.st-status-row {
+/* ── Contexto do teste ── */
+.st-card--test-context {
+  gap: 12px;
+}
+
+.st-context-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.st-context-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.st-context-icon {
+  color: var(--text-2);
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  width: 24px;
+  padding-top: 1px;
 }
 
-.st-status-icon { color: var(--text-2); flex-shrink: 0; }
+.st-context-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
 
-.st-status-label {
+.st-context-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.st-context-value {
   font-family: var(--font-body);
   font-size: 14px;
+  font-weight: 600;
   color: var(--text);
-  flex: 1;
+  overflow-wrap: anywhere;
 }
 
-.st-status-value {
+.st-context-description {
   font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
   color: var(--text-2);
-  text-align: right;
+  line-height: 1.35;
 }
-
-.st-status-value--ok   { color: var(--success, #34D399); }
-.st-status-value--fail { color: var(--error, #F87171); }
 
 /* ── Bottom sheet ── */
 .st-sheet-overlay {
