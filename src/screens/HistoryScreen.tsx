@@ -77,6 +77,85 @@ function bufferbloatLabel(severity: string | undefined): string | null {
   return null;
 }
 
+function average(records: TestRecord[], pick: (record: TestRecord) => number): number {
+  if (records.length === 0) return 0;
+  return records.reduce((sum, record) => sum + pick(record), 0) / records.length;
+}
+
+function recentTrendSummary(items: TestRecord[]): { title: string; body: string; severity: 'good' | 'neutral' | 'bad' } {
+  if (items.length < 3) {
+    return {
+      title: 'Ainda não há base para tendência',
+      body: 'Faça mais alguns testes em horários diferentes para comparar a evolução da conexão.',
+      severity: 'neutral',
+    };
+  }
+
+  const newest = items.slice(0, Math.min(3, items.length));
+  const older = items.slice(Math.min(3, items.length), Math.min(6, items.length));
+  if (older.length === 0) {
+    return {
+      title: 'Primeiros registros salvos',
+      body: 'Acompanhe os próximos testes para saber se a conexão melhora, piora ou fica estável.',
+      severity: 'neutral',
+    };
+  }
+
+  const newestDl = average(newest, (record) => record.dl);
+  const olderDl = average(older, (record) => record.dl);
+  const newestLatency = average(newest, (record) => record.latency);
+  const olderLatency = average(older, (record) => record.latency);
+  const dlChange = olderDl > 0 ? ((newestDl - olderDl) / olderDl) * 100 : 0;
+  const latencyChange = olderLatency > 0 ? ((newestLatency - olderLatency) / olderLatency) * 100 : 0;
+
+  if (dlChange >= 10) {
+    return {
+      title: 'A conexão melhorou nos testes recentes',
+      body: `O download médio subiu ${Math.round(dlChange)}% em relação aos registros anteriores.`,
+      severity: 'good',
+    };
+  }
+  if (dlChange <= -10) {
+    return {
+      title: 'A conexão piorou nos testes recentes',
+      body: `O download médio caiu ${Math.abs(Math.round(dlChange))}% em relação aos registros anteriores.`,
+      severity: 'bad',
+    };
+  }
+  if (latencyChange >= 20) {
+    return {
+      title: 'A resposta da conexão ficou mais lenta',
+      body: `O tempo de resposta médio subiu ${Math.round(latencyChange)}% nos testes recentes.`,
+      severity: 'bad',
+    };
+  }
+  if (latencyChange <= -20) {
+    return {
+      title: 'A resposta da conexão melhorou',
+      body: `O tempo de resposta médio caiu ${Math.abs(Math.round(latencyChange))}% nos testes recentes.`,
+      severity: 'good',
+    };
+  }
+
+  return {
+    title: 'A conexão está estável nos testes recentes',
+    body: 'Os últimos registros estão parecidos com os anteriores. Continue testando em horários diferentes.',
+    severity: 'neutral',
+  };
+}
+
+function historySummary(items: TestRecord[], unit: 'mbps' | 'gbps') {
+  const latest = items[0];
+  return {
+    title: `${items.length} teste${items.length > 1 ? 's' : ''} salvo${items.length > 1 ? 's' : ''}`,
+    body: `Último teste: ${latest ? `${formatMbps(latest.dl, unit)} de download e resposta em ${formatMs(latest.latency)} ms.` : 'Nenhum teste salvo.'}`,
+    avgDownload: formatMbps(average(items, (record) => record.dl), unit),
+    avgUpload: formatMbps(average(items, (record) => record.ul), unit),
+    avgLatency: `${formatMs(average(items, (record) => record.latency))} ms`,
+    trend: recentTrendSummary(items),
+  };
+}
+
 /* ── SpeedBar ───────────────────────────────────────────────────────── */
 
 function SpeedBar({ value, maxValue, color, arrow, unit }: {
@@ -122,9 +201,37 @@ function HistoricoCard({ record, maxValue, unit, onClick }: {
       <SpeedBar value={record.ul} maxValue={maxValue} color="var(--ul)" arrow="↑" unit={unit} />
       <div className="lk-hist-card__footer">
         <Icon name="globe" size={14} color="var(--text-3)" />
-        <span>{tipoLabel(record.connectionType)} | {formatMs(record.latency)} ms</span>
+        <span>{tipoLabel(record.connectionType)} · resposta em {formatMs(record.latency)} ms</span>
       </div>
     </button>
+  );
+}
+
+function HistorySummaryCard({ items, unit }: { items: TestRecord[]; unit: 'mbps' | 'gbps' }) {
+  const summary = historySummary(items, unit);
+
+  return (
+    <section className={`lk-history__summary lk-history__summary--${summary.trend.severity}`} aria-label="Resumo do histórico">
+      <div className="lk-history__summary-copy">
+        <p className="lk-history__summary-title">{summary.trend.title}</p>
+        <p className="lk-history__summary-body">{summary.trend.body}</p>
+        <p className="lk-history__summary-last">{summary.body}</p>
+      </div>
+      <div className="lk-history__summary-grid" aria-label={summary.title}>
+        <div>
+          <span>Média para receber</span>
+          <strong>{summary.avgDownload}</strong>
+        </div>
+        <div>
+          <span>Média para enviar</span>
+          <strong>{summary.avgUpload}</strong>
+        </div>
+        <div>
+          <span>Resposta média</span>
+          <strong>{summary.avgLatency}</strong>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -208,15 +315,15 @@ function HistoricoDetailSheet({ record, unit, onClose }: {
         <div className="lk-hist-detail__secondary-row">
           <div className="lk-hist-detail__secondary">
             <span className="lk-hist-detail__sec-value">{formatMs(record.latency)} ms</span>
-            <span className="lk-hist-detail__sec-label">Latência</span>
+            <span className="lk-hist-detail__sec-label">Tempo de resposta</span>
           </div>
           <div className="lk-hist-detail__secondary">
             <span className="lk-hist-detail__sec-value">{record.jitter.toFixed(1)} ms</span>
-            <span className="lk-hist-detail__sec-label">Oscilação</span>
+            <span className="lk-hist-detail__sec-label">Variação</span>
           </div>
           <div className="lk-hist-detail__secondary">
             <span className="lk-hist-detail__sec-value">{record.packetLoss.toFixed(1)}%</span>
-            <span className="lk-hist-detail__sec-label">Perda</span>
+            <span className="lk-hist-detail__sec-label">Falhas</span>
           </div>
         </div>
 
@@ -228,13 +335,13 @@ function HistoricoDetailSheet({ record, unit, onClose }: {
           <div className="lk-hist-detail__divider" />
           {bbLabel && (
             <>
-              <SheetRow label="Bufferbloat" value={bbLabel} />
+              <SheetRow label="Atraso sob carga" value={bbLabel} />
               <div className="lk-hist-detail__divider" />
             </>
           )}
           <SheetRow label="Streaming" value={streamingVeredito(record)} />
           <div className="lk-hist-detail__divider" />
-          <SheetRow label="Games" value={gamerVeredito(record)} />
+          <SheetRow label="Jogos online" value={gamerVeredito(record)} />
           <div className="lk-hist-detail__divider" />
           <SheetRow label="Vídeo chamada" value={videoChamadaVeredito(record)} />
           {gargalo && (
@@ -316,6 +423,8 @@ export function HistoryScreen({ theme, unit = 'mbps', initialSelectedId, onBack,
           <EmptyHistorico />
         ) : (
           <div className="lk-history__content">
+            <HistorySummaryCard items={items} unit={unit} />
+
             {trendCard && (
               <section
                 className={`lk-history__trend lk-history__trend--${trendCard.description.severity}`}
