@@ -424,6 +424,16 @@
   min-width: 0;
 }
 
+.lk-result__use-reason {
+  display: block;
+  margin-top: 2px;
+  max-width: 210px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--text-2);
+}
+
 .lk-result__use-badge {
   font-family: var(--font-body);
   font-size: 11px;

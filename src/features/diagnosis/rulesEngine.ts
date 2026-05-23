@@ -98,7 +98,7 @@ function analyzeMetrics(ctx: DiagnosisContext): {
     problems.push({
       id: `prob-pl-${Date.now()}`,
       metric: 'packetLoss',
-      description: `Perda de pacotes elevada (${packetLoss.toFixed(1)}%)`,
+      description: `Falhas na conexão (${packetLoss.toFixed(1)}%)`,
       severity: 'fail',
     });
   }
@@ -125,14 +125,14 @@ function analyzeMetrics(ctx: DiagnosisContext): {
     problems.push({
       id: `prob-ping-fail-${Date.now()}`,
       metric: 'ping',
-      description: `Latência crítica (${ping.toFixed(0)}ms)`,
+      description: `Resposta muito lenta (${ping.toFixed(0)}ms)`,
       severity: 'fail',
     });
   } else if (ping > thresholds.maxPing) {
     problems.push({
       id: `prob-ping-warn-${Date.now()}`,
       metric: 'ping',
-      description: `Latência elevada (${ping.toFixed(0)}ms)`,
+      description: `Resposta lenta (${ping.toFixed(0)}ms)`,
       severity: 'warn',
     });
   }

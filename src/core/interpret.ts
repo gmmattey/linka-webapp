@@ -94,10 +94,44 @@ function getPrimaryQualityAndTags(
 }
 
 function getUseCaseStatus(
-  _result: SpeedTestResult,
+  result: SpeedTestResult,
   useCaseId: UseCaseId,
 ): UseCaseVerdict {
-  return { id: useCaseId, status: 'unknown', blockingFactors: [] };
+  const keyByUseCase: Record<UseCaseId, keyof typeof profiles.useCases> = {
+    gaming: 'gaming',
+    streaming_4k: 'streaming4K',
+    home_office: 'homeOffice',
+    video_call: 'videoCall',
+  };
+  const thresholds = profiles.useCases[keyByUseCase[useCaseId]];
+  const factors: UseCaseVerdict['blockingFactors'] = [];
+
+  const collectBlockingFactors = (level: keyof typeof thresholds) => {
+    const rules = thresholds[level];
+    if ('download' in rules && result.dl < rules.download) factors.push('dl');
+    if ('upload' in rules && result.ul < rules.upload) factors.push('ul');
+    if ('latency' in rules && result.latency > rules.latency) factors.push('latency');
+    if ('jitter' in rules && result.jitter > rules.jitter) factors.push('jitter');
+    if ('packetLoss' in rules && result.packetLoss > rules.packetLoss) factors.push('packetLoss');
+  };
+
+  const passes = (level: keyof typeof thresholds) => {
+    const rules = thresholds[level];
+    return (!('download' in rules) || result.dl >= rules.download)
+      && (!('upload' in rules) || result.ul >= rules.upload)
+      && (!('latency' in rules) || result.latency <= rules.latency)
+      && (!('jitter' in rules) || result.jitter <= rules.jitter)
+      && (!('packetLoss' in rules) || result.packetLoss <= rules.packetLoss);
+  };
+
+  if (passes('good')) return { id: useCaseId, status: 'good', blockingFactors: [] };
+  if (passes('acceptable')) {
+    collectBlockingFactors('good');
+    return { id: useCaseId, status: 'acceptable', blockingFactors: Array.from(new Set(factors)) };
+  }
+
+  collectBlockingFactors('acceptable');
+  return { id: useCaseId, status: 'fail', blockingFactors: Array.from(new Set(factors)) };
 }
 
 function getRecommendations(

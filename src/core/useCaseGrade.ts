@@ -92,13 +92,16 @@ export function gradeMetric(
     case 'jitter': {
       if (value <= rules.excellent.jitter) return 'A';
       if (value <= rules.good.jitter)      return 'B';
-      return 'C';
+      if (value <= profiles.flags.unstableJitter) return 'C';
+      if (value <= profiles.flags.veryUnstableJitter) return 'D';
+      return 'F';
     }
     case 'packetLoss': {
       if (value <= rules.excellent.packetLoss) return 'A';
       if (value <= rules.good.packetLoss)      return 'B';
       if (value <= rules.fair.packetLoss)      return 'C';
-      return 'D';
+      if (value <= profiles.flags.veryUnstablePacketLoss) return 'D';
+      return 'F';
     }
   }
 }

@@ -241,7 +241,7 @@ Decisão de auditoria de marca (2026):
 | Contexto | Termo a usar |
 |---|---|
 | Label do gauge na tela de medição (RunningScreen) | **Ping** |
-| Copy voltado ao público gamer | **Ping** |
+| Copy voltado ao público gamer | **Ping** quando falar com a persona gamer; em alertas gerais, prefira explicar o motivo com "resposta", "oscilação" e "falhas" |
 | Corpo de diagnósticos técnicos (DiagnosticScreen) | Latência (aceitável) |
 | Footer / exportação PDF | Latência (contexto técnico aceita) |
 

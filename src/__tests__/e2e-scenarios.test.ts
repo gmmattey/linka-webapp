@@ -298,6 +298,25 @@ describe('E2E — Use Case Verdict Consistency', () => {
       gradeRank[poorGrade],
     );
   });
+
+  it('gaming flags oscilacao e falhas fortes as alert reasons', () => {
+    const metrics: SpeedTestResult = {
+      dl: 200,
+      ul: 50,
+      latency: 25,
+      jitter: 90,
+      packetLoss: 6,
+      timestamp: Date.now(),
+    };
+
+    const result = interpretSpeedTestResult(metrics, 'fixed_broadband');
+    const gaming = result.useCases.find((uc) => uc.id === 'gaming');
+
+    expect(result.primary).toBe('slow');
+    expect(gaming?.status).toBe('fail');
+    expect(gaming?.blockingFactors).toEqual(expect.arrayContaining(['jitter', 'packetLoss']));
+    expect(useCaseGrade(gaming!, metrics, 'fixed_broadband')).toBe('F');
+  });
 });
 
 describe('E2E — Stability Level Progression', () => {

@@ -95,6 +95,22 @@ function ucLabel(id: UseCaseId): string {
   return resolveCopy(`useCase.${id}.label.short`);
 }
 
+function getUseCaseAlertReason(id: UseCaseId, factors: Array<'dl' | 'ul' | 'latency' | 'jitter' | 'packetLoss' | 'unknown'>): string {
+  if (id === 'gaming') {
+    if (factors.includes('packetLoss')) return 'Falhas na conexão podem causar quedas durante a partida.';
+    if (factors.includes('jitter')) return 'A oscilação pode causar lag mesmo com boa velocidade.';
+    if (factors.includes('latency')) return 'O ping está alto para comandos em tempo real.';
+    return resolveCopy('useCase.gaming.acceptable_reason');
+  }
+
+  if (factors.includes('packetLoss')) return 'Falhas na conexão podem causar travamentos.';
+  if (factors.includes('jitter')) return 'Oscilação alta pode deixar a experiência instável.';
+  if (factors.includes('latency')) return 'A resposta está demorando mais que o ideal.';
+  if (factors.includes('ul')) return 'O envio de dados está abaixo do ideal.';
+  if (factors.includes('dl')) return 'A velocidade está abaixo do ideal para este uso.';
+  return 'Pode funcionar com limitações.';
+}
+
 // =============================================================================
 // Grade A-F — estilo + label
 // =============================================================================
@@ -358,7 +374,7 @@ function DiagnosticActionList({
         <div className="lk-result__combined-action lk-result__combined-action--secondary">
           <span>Otimização adicional:</span>
           <strong>
-            Trocar para Cloudflare ou Google pode reduzir a latência dos Serviços de Internet (DNS).
+            Trocar para Cloudflare ou Google pode reduzir o tempo de resposta dos Serviços de Internet (DNS).
             Veja como em Mais detalhes &gt; Serviços de Internet &gt; Como alterar.
           </strong>
         </div>
@@ -965,7 +981,14 @@ export function ResultScreen({
                     <div className="lk-result__use-icon-wrap">
                       <Icon name={ucIcon(id)} size={20} color="var(--accent)" />
                     </div>
-                    <span className="lk-result__use-lbl">{ucLabel(id)}</span>
+                    <span className="lk-result__use-lbl">
+                      {ucLabel(id)}
+                      {!isPositive && (
+                        <span className="lk-result__use-reason">
+                          {getUseCaseAlertReason(id, blockingFactors)}
+                        </span>
+                      )}
+                    </span>
                     {isPositive ? (
                       <span className="lk-result__use-ok">
                         <Icon name="check-circle" size={14} color="var(--success)" />
@@ -983,7 +1006,7 @@ export function ResultScreen({
             })}
             {/* W5-B — Nota sobre jitter ao final da seção de uso */}
             <p className="lk-result__use-jitter-note">
-              Oscilação é a variação da latência — valores altos causam lag em jogos e travamentos em videochamadas.
+              Oscilação é quando o tempo de resposta varia — valores altos causam lag em jogos e travamentos em videochamadas.
             </p>
           </div>
         )}
@@ -1104,7 +1127,7 @@ export function ResultScreen({
                 icon: <Icon name="ping" size={14} color="var(--text-2)" />,
                 iconBg: 'var(--surface-3)',
                 title: 'Serviços de Internet',
-                subtitle: 'DNS: provedor, latência e como alterar',
+                subtitle: 'DNS: provedor, resposta e como alterar',
                 showChevron: true,
                 onClick: () => setActiveSheet('dns'),
               },
