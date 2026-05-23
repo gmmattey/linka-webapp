@@ -54,9 +54,9 @@ function phraseFor(phase: TestPhase): string {
 type PhaseStep = { id: TestPhase; label: string };
 
 const STEPS_V2: PhaseStep[] = [
-  { id: 'latency',  label: resolveCopy('metric.latency.short') },
-  { id: 'download', label: 'DOWN' },
-  { id: 'upload',   label: 'UP' },
+  { id: 'latency',  label: 'Resposta' },
+  { id: 'download', label: 'Download' },
+  { id: 'upload',   label: 'Upload' },
 ];
 
 const PHASE_ORDER: TestPhase[] = ['latency', 'download', 'upload', 'load', 'dns', 'done'];
@@ -99,6 +99,50 @@ function gaugeColor(phase: TestPhase): string {
   }
 }
 
+function stageFor(phase: TestPhase): { title: string; detail: string } {
+  switch (phase) {
+    case 'latency':
+      return {
+        title: 'Resposta da conexão',
+        detail: 'Medindo quanto tempo a rede leva para responder.',
+      };
+    case 'download':
+      return {
+        title: 'Velocidade para receber dados',
+        detail: 'Baixando dados de teste para medir o download.',
+      };
+    case 'upload':
+      return {
+        title: 'Velocidade para enviar dados',
+        detail: 'Enviando dados de teste para medir o upload.',
+      };
+    case 'load':
+      return {
+        title: 'Estabilidade sob uso intenso',
+        detail: 'Conferindo se a conexão atrasa quando está ocupada.',
+      };
+    case 'dns':
+      return {
+        title: 'Resposta dos servidores DNS',
+        detail: 'Testando quanto tempo leva para encontrar endereços.',
+      };
+    case 'done':
+      return {
+        title: 'Finalizando resultado',
+        detail: 'Organizando os números antes de mostrar a análise.',
+      };
+    default:
+      return {
+        title: 'Preparando medição',
+        detail: 'Separando as etapas do teste.',
+      };
+  }
+}
+
+function expectedDurationFor(mode?: SpeedTestMode): string {
+  return mode === 'fast' ? 'cerca de 15s' : 'cerca de 60s';
+}
+
 export function RunningScreen({
   phase,
   instantMbps,
@@ -107,6 +151,7 @@ export function RunningScreen({
   onRetry,
   unit = 'mbps',
   sessionLabel,
+  mode,
   live = [],
   server = null,
   useHaptics = true,
@@ -130,6 +175,8 @@ export function RunningScreen({
     typeof overallProgress === 'number' && Number.isFinite(overallProgress)
       ? Math.max(0, Math.min(1, overallProgress))
       : gaugeProgressFallback(phase);
+  const progressPercent = Math.round(gaugeFill * 100);
+  const stage = stageFor(phase);
 
   // Linha sutil "Servidor · Local · ISP" abaixo de "Medindo…" — Bloco 2
   // (Hero confiante, 2026-05). Filtra placeholders ('—') para não poluir
@@ -200,6 +247,28 @@ export function RunningScreen({
             color={gaugeColor(phase)}
           />
         </div>
+        <section className="lk-running__progress-card" aria-label="Progresso do teste">
+          <div className="lk-running__progress-head">
+            <span className="lk-running__progress-eyebrow">Agora</span>
+            <span className="lk-running__progress-percent">{progressPercent}%</span>
+          </div>
+          <h2 className="lk-running__progress-title">{stage.title}</h2>
+          <p className="lk-running__progress-detail">{stage.detail}</p>
+          <div
+            className="lk-running__progress-bar"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progressPercent}
+            aria-label={`Progresso do teste: ${progressPercent}%`}
+          >
+            <span style={{ width: `${progressPercent}%` }} />
+          </div>
+          <div className="lk-running__progress-meta">
+            <span>Duração esperada: {expectedDurationFor(mode)}</span>
+            <span>Atualizando em tempo real</span>
+          </div>
+        </section>
         {/* Resultado de download durante upload (idêntico ao Kotlin VelocidadeScreen) */}
         {avgDownloadMbps != null && (
           <div className="lk-running__dl-preview">
@@ -248,7 +317,7 @@ export function RunningScreen({
         </p>
         {sessionLabel && <p className="lk-running__session-label">{sessionLabel}</p>}
         <div className="lk-running__footer">
-          <button className="btn-text lk-running__cancel" onClick={onCancel}>Cancelar</button>
+          <button className="btn-text lk-running__cancel" onClick={onCancel}>Cancelar teste</button>
         </div>
       </main>
     </div>

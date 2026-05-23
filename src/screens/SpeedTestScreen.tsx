@@ -15,6 +15,8 @@ interface Props {
   server: ServerInfo | null;
   settings: Settings;
   onUpdateSettings: (patch: Partial<Settings>) => void;
+  cancelledNotice?: boolean;
+  onDismissCancelledNotice?: () => void;
 }
 
 type ModeOption = 'fast' | 'complete' | 'triplo';
@@ -39,6 +41,8 @@ export function SpeedTestScreen({
   server,
   settings,
   onUpdateSettings,
+  cancelledNotice = false,
+  onDismissCancelledNotice,
 }: Props) {
   const { scrolled, topBarOpacity, scrollContainerRef, sentinelRef } = useScrollHeader();
   const [mode, setMode] = useState<ModeOption>(settings.defaultMode ?? 'complete');
@@ -79,6 +83,25 @@ export function SpeedTestScreen({
         <ModeSelector mode={mode} onSelect={setMode} />
 
         <p className="st-mode-desc">{MODE_DESC[mode]}</p>
+
+        {cancelledNotice && (
+          <div className="st-cancelled-notice" role="status" aria-live="polite">
+            <div className="st-cancelled-notice__text">
+              <span className="st-cancelled-notice__title">Teste cancelado</span>
+              <span className="st-cancelled-notice__body">A medição foi interrompida e nenhum resultado novo foi salvo.</span>
+            </div>
+            {onDismissCancelledNotice && (
+              <button
+                className="st-cancelled-notice__dismiss"
+                type="button"
+                onClick={onDismissCancelledNotice}
+                aria-label="Fechar aviso de teste cancelado"
+              >
+                <CloseIcon />
+              </button>
+            )}
+          </div>
+        )}
 
         {/* ── Contexto do teste ── */}
         <TestContextCard device={device} server={server} />
@@ -585,6 +608,14 @@ function ChevronIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ color: 'var(--text-3)' }}>
       <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

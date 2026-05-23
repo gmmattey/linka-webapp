@@ -117,6 +117,8 @@ export default function App() {
     return 'complete';
   });
 
+  const [testCancelledNotice, setTestCancelledNotice] = useState(false);
+
   const recordedRef = useRef(false);
   const runStartTimeRef = useRef<number>(0);
   const backStackRef = useRef<Screen[]>([]);
@@ -276,6 +278,7 @@ export default function App() {
     setTestMode(mode);
     updateSettings({ defaultMode: mode });
     recordedRef.current = false;
+    setTestCancelledNotice(false);
     goTo('running');
     test.start(effectiveConnection, mode);
   }, [test, effectiveConnection, goTo, updateSettings]);
@@ -283,8 +286,9 @@ export default function App() {
   const handleCancel = useCallback(() => {
     test.cancel();
     test.reset();
-    goTo(lastRecord ? 'result' : 'home');
-  }, [test, goTo, lastRecord]);
+    setTestCancelledNotice(true);
+    goTo('velocidade');
+  }, [test, goTo]);
 
   const handleRetry = useCallback(() => {
     test.reset();
@@ -369,6 +373,8 @@ export default function App() {
             server={deviceInfo.server}
             settings={settings}
             onUpdateSettings={updateSettings}
+            cancelledNotice={testCancelledNotice}
+            onDismissCancelledNotice={() => setTestCancelledNotice(false)}
           />
         );
       case 'running': {
@@ -492,7 +498,7 @@ export default function App() {
     handleAppRefresh, handleResetOnboarding,
     goBack, goTo, goToReturnTarget,
     capabilities.localWifiDiagnostics,
-    settings, updateSettings, testMode,
+    settings, updateSettings, testMode, testCancelledNotice,
   ]);
 
   return (

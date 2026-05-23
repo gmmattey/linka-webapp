@@ -42,6 +42,83 @@
   justify-content: center;
   flex: 1;
   align-items: center;
+  min-height: 220px;
+}
+
+/* ── Progresso humano ────────────────────────────── */
+.lk-running__progress-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin: 0 auto var(--space-md);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.lk-running__progress-head,
+.lk-running__progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lk-running__progress-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+}
+
+.lk-running__progress-percent {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.lk-running__progress-title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.lk-running__progress-detail {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.lk-running__progress-bar {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.lk-running__progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 260ms ease-out;
+}
+
+.lk-running__progress-meta {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-3);
 }
 
 /* ── Download result during upload ───────────────── */
@@ -97,14 +174,16 @@
 }
 
 .lk-running__step-pill {
-  padding: 4px 10px;
+  min-width: 74px;
+  padding: 4px 8px;
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   color: var(--text-3);
   background: transparent;
+  text-align: center;
   transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
 }
 
