@@ -116,9 +116,14 @@
   transform: scale(0.98);
 }
 
-.orbit-screen__welcome-card-emoji {
-  font-size: 24px;
+.orbit-screen__welcome-card-icon {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  color: var(--orbit-accent-soft, #9B7FFF);
 }
 
 .orbit-screen__welcome-card-text {

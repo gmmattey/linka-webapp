@@ -485,7 +485,7 @@ export function ExploreScreen({
             <div className="lk-settings-about">
               <div className="lk-settings-about-row">
                 <span>Status</span>
-                <span className="lk-settings-status-ok">✓ Sempre ativa</span>
+                <span className="lk-settings-status-ok">Sempre ativa</span>
               </div>
               <div className="lk-settings-about-row">
                 <span>Jitter</span>
@@ -632,7 +632,7 @@ export function ExploreScreen({
             <div className="lk-settings-about-row"><span>Versão</span><span>v1.1.0</span></div>
             <div className="lk-settings-about-row"><span>Plataforma</span><span>Web PWA</span></div>
             <div className="lk-settings-about-row"><span>Motor</span><span>Cloudflare Speed Test</span></div>
-            <div className="lk-settings-about-row"><span>Integridade</span><span className="lk-settings-status-ok">✓ OK</span></div>
+            <div className="lk-settings-about-row"><span>Integridade</span><span className="lk-settings-status-ok">OK</span></div>
           </div>
           <div className="lk-settings-diag-note">
             <Icon name="shield" size={14} color="var(--success)" />
