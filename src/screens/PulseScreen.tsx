@@ -5,6 +5,7 @@ import { DiagnosisChips } from '../components/DiagnosisChips';
 import { LinkaPulseSymbol } from '../components/LinkaPulseSymbol';
 import { RotatingMessage } from '../components/RotatingMessage';
 import { TopBar } from '../components/TopBar';
+import { Icon } from '../components/icons';
 import type { OpcaoResposta } from '../features/pulse/types';
 import type { PulsePhase, PulseResultLevel, IntelligentSession, AiAnalysisEntry } from '../features/pulse/types';
 import './PulseScreen.css';
@@ -28,10 +29,10 @@ const FEEDBACK_CHIPS: OpcaoResposta[] = [
 ];
 
 const WELCOME_CARDS = [
-  { id: 'internet_lenta',  emoji: '🐢', label: 'Internet lenta',    sub: 'Velocidade abaixo do esperado' },
-  { id: 'streaming',       emoji: '📺', label: 'Streaming ruim',    sub: 'Travamentos ou qualidade baixa' },
-  { id: 'jogos',           emoji: '🎮', label: 'Jogos travando',    sub: 'Lag ou alta latência em jogos' },
-  { id: 'chamadas',        emoji: '📞', label: 'Chamadas instáveis', sub: 'Quedas ou eco em videochamadas' },
+  { id: 'internet_lenta',  icon: 'ping',      label: 'Internet lenta',    sub: 'Velocidade abaixo do esperado' },
+  { id: 'streaming',       icon: 'stream',    label: 'Streaming ruim',    sub: 'Travamentos ou qualidade baixa' },
+  { id: 'jogos',           icon: 'game',      label: 'Jogos travando',    sub: 'Lag ou alta latência em jogos' },
+  { id: 'chamadas',        icon: 'videoCall', label: 'Chamadas instáveis', sub: 'Quedas ou eco em videochamadas' },
 ];
 
 function phaseToSymbolState(phase: PulsePhase, severity?: PulseResultLevel) {
@@ -98,7 +99,7 @@ export function PulseScreen({
                 onClick={onIniciar}
                 type="button"
               >
-                <span className="orbit-screen__welcome-card-emoji">{card.emoji}</span>
+                <span className="orbit-screen__welcome-card-icon"><Icon name={card.icon} size={18} /></span>
                 <div className="orbit-screen__welcome-card-text">
                   <span className="orbit-screen__welcome-card-label">{card.label}</span>
                   <span className="orbit-screen__welcome-card-sub">{card.sub}</span>
@@ -167,9 +168,9 @@ export function PulseScreen({
           {(phase === 'result' || phase === 'awaitingChips') && session && (
             <div className="orbit-screen__severity-row">
               <span className={`orbit-screen__badge orbit-screen__badge--${session.diagnosticSeverity}`}>
-                {session.diagnosticSeverity === 'success' && '✓ Rede OK'}
-                {session.diagnosticSeverity === 'warning' && '⚠ Atenção necessária'}
-                {session.diagnosticSeverity === 'critical' && '✕ Problemas críticos'}
+                {session.diagnosticSeverity === 'success' && 'Rede OK'}
+                {session.diagnosticSeverity === 'warning' && 'Atenção necessária'}
+                {session.diagnosticSeverity === 'critical' && 'Problemas críticos'}
               </span>
             </div>
           )}

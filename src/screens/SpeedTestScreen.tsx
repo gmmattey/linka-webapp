@@ -172,7 +172,7 @@ function DoneCircle({ onRepeat }: { onRepeat: () => void }) {
       aria-label="Repetir teste de velocidade"
       type="button"
     >
-      <span className="st-circle__check" aria-hidden="true">✓</span>
+      <span className="st-circle__check" aria-hidden="true"><CheckCircleIcon /></span>
       <span className="st-circle__repeat">Repetir</span>
     </button>
   );
@@ -559,7 +559,7 @@ function SheetRow({ title, desc, onClick, active, soon }: {
 function CriterioIcon({ ok }: { ok: boolean }) {
   return (
     <span className={`st-criterio-icon ${ok ? 'st-criterio-icon--ok' : 'st-criterio-icon--fail'}`} aria-hidden="true">
-      {ok ? '✓' : '✕'}
+      {ok ? <CheckCircleIcon /> : <ErrorCircleIcon />}
     </span>
   );
 }

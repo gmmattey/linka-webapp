@@ -31,3 +31,4 @@
 - Quando o navegador nao identificar o tipo de rede, a interface deve informar "Rede nao identificada" e nao deve assumir Wi-Fi, cabo, dados moveis ou desconexao.
 - Cancelar uma medicao deve encerrar o fluxo com aviso claro de que o teste foi interrompido e nenhum resultado novo foi salvo.
 - Nenhuma tela deve depender de runtime nativo.
+- Evitar emoji e simbolos decorativos na UI final; preferir icones e texto com tokens do design system.
