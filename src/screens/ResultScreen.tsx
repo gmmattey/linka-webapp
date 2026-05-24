@@ -80,6 +80,7 @@ interface Props {
 }
 
 type ShareStatus = 'idle' | 'copied';
+type FocusUseCase = UseCaseId | 'all';
 
 /** Sheets de "Mais detalhes" — só uma aberta por vez (refator drag-to-resize 2026-05). */
 type ActiveSheet = 'advanced' | 'gamer' | 'dns' | null;
@@ -511,6 +512,7 @@ export function ResultScreen({
   const animDns    = useCountUp(result.dnsLatencyMs ?? 0, 700, 0);
 
   const [shareStatus, setShareStatus] = useState<ShareStatus>('idle');
+  const [focusUseCase, setFocusUseCase] = useState<FocusUseCase>('all');
   const [waGenerating, setWaGenerating] = useState(false);
   const [imgGenerating, setImgGenerating] = useState(false);
   const shareResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -609,6 +611,11 @@ export function ResultScreen({
   // `activeSheet` unifica os 3 estados — só uma sheet aberta por vez.
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const closeActiveSheet = useCallback(() => setActiveSheet(null), []);
+
+  const focusedUseCaseEntry = useMemo(() => {
+    if (focusUseCase === 'all') return null;
+    return interpreted.useCases.find((u) => u.id === focusUseCase) ?? null;
+  }, [focusUseCase, interpreted.useCases]);
 
   return (
     <div className="lk-result fade-in">
@@ -1091,6 +1098,33 @@ export function ResultScreen({
         {interpreted.useCases.length > 0 && (
           <div className="lk-result__use-list">
             <p className="lk-result__use-header">EXPERIÊNCIA DE USO</p>
+            <div className="lk-result__use-focus">
+              <button
+                type="button"
+                className={`lk-result__use-focus-chip ${focusUseCase === 'all' ? 'is-active' : ''}`}
+                onClick={() => setFocusUseCase('all')}
+              >
+                Todos
+              </button>
+              {interpreted.useCases.map(({ id }) => (
+                <button
+                  key={`focus-${id}`}
+                  type="button"
+                  className={`lk-result__use-focus-chip ${focusUseCase === id ? 'is-active' : ''}`}
+                  onClick={() => setFocusUseCase(id)}
+                >
+                  {ucLabel(id)}
+                </button>
+              ))}
+            </div>
+            {focusedUseCaseEntry && (
+              <p className="lk-result__use-focus-summary">
+                Perfil selecionado: <strong>{ucLabel(focusedUseCaseEntry.id)}</strong>.
+                {focusedUseCaseEntry.status === 'good'
+                  ? ' Sua conexão está adequada para este uso.'
+                  : ' Este uso pode sofrer com limitações na conexão atual.'}
+              </p>
+            )}
             <div className="lk-result__use-divider" />
             {interpreted.useCases.map(({ id, status, blockingFactors }) => {
               const grade = computeUseCaseGrade({ id, status, blockingFactors }, result, profile);
