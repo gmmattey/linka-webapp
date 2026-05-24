@@ -24,6 +24,7 @@ import { toConnectionProfile } from '../utils/connectionProfile';
 import { anatelGrade, anatelGradeColorVar, anatelGradeGlowVar } from '../utils/anatelColor';
 import { classifyDnsLatency } from '../utils/dnsTiming';
 import { aggregateDiagnosisSeverity, type DiagnosisAggregate, type DiagnosisItem } from '../utils/diagnosisItems';
+import { evaluateMeasurementConfidence } from '../utils/measurementConfidence';
 import { WifiSignalSection } from '../features/local-wifi/WifiSignalSection';
 import { WifiContextCard } from '../features/ios-wifi-context/WifiContextCard';
 
@@ -442,6 +443,7 @@ export function ResultScreen({
   );
 
   const diagnosisItems = useDiagnosisItems(result, connectionType);
+  const measurementConfidence = useMemo(() => evaluateMeasurementConfidence(result), [result]);
 
   const unitLabel = unit === 'gbps' ? 'Gbps' : 'Mbps';
 
@@ -914,6 +916,19 @@ export function ResultScreen({
             </div>
           );
         })()}
+
+        <div className={`lk-result__confidence lk-result__confidence--${measurementConfidence.level}`}>
+          <div className="lk-result__confidence-top">
+            <span className="lk-result__confidence-kicker">Confiança da medição</span>
+            <span className="lk-result__confidence-badge">{measurementConfidence.label}</span>
+          </div>
+          <p className="lk-result__confidence-reason">{measurementConfidence.reason}</p>
+          {measurementConfidence.shouldRetest && (
+            <p className="lk-result__confidence-next">
+              Próximo passo: repita o teste para confirmar este resultado.
+            </p>
+          )}
+        </div>
 
         {/* ── W5-A — Card RQUAL Anatel ─────────────────────────────────
             Aparece apenas quando o usuário cadastrou velocidade contratada
