@@ -616,6 +616,36 @@
   color: var(--text);
 }
 
+.lk-result__next-test {
+  margin: 0 16px 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+}
+
+.lk-result__next-test-kicker {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+
+.lk-result__next-test-text {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.lk-result__next-test-btn {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 /* ── Secondary details ───────────────────────────── */
 
 .lk-result__details {

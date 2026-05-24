@@ -83,6 +83,14 @@ type ShareStatus = 'idle' | 'copied';
 
 /** Sheets de "Mais detalhes" — só uma aberta por vez (refator drag-to-resize 2026-05). */
 type ActiveSheet = 'advanced' | 'gamer' | 'dns' | null;
+type ComplementaryTest = 'dns' | 'wifi' | 'advanced';
+
+function inferComplementaryTest(items: DiagnosisItem[], connectionType: ConnectionType | null | undefined): ComplementaryTest {
+  const text = items.map((i) => `${i.problem} ${i.action}`.toLowerCase()).join(' ');
+  if (text.includes('dns') || text.includes('serviços de internet')) return 'dns';
+  if (text.includes('wi-fi') || text.includes('wifi') || text.includes('roteador') || connectionType === 'wifi') return 'wifi';
+  return 'advanced';
+}
 
 function ucIcon(id: UseCaseId): string {
   if (id === 'gaming')       return 'game';
@@ -485,6 +493,10 @@ export function ResultScreen({
       trendText,
     };
   }, [connectionType, history, result.dl, result.timestamp]);
+  const complementaryTest = useMemo(
+    () => inferComplementaryTest(diagnosisItems.items, connectionType),
+    [connectionType, diagnosisItems.items],
+  );
 
   const unitLabel = unit === 'gbps' ? 'Gbps' : 'Mbps';
 
@@ -968,6 +980,36 @@ export function ResultScreen({
             <p className="lk-result__confidence-next">
               Próximo passo: repita o teste para confirmar este resultado.
             </p>
+          )}
+        </div>
+
+        <div className="lk-result__next-test">
+          <p className="lk-result__next-test-kicker">Teste complementar recomendado</p>
+          {complementaryTest === 'dns' && (
+            <>
+              <p className="lk-result__next-test-text">Seu próximo passo mais útil agora é validar Serviços de Internet (DNS).</p>
+              <button type="button" className="btn-text lk-result__next-test-btn" onClick={() => setActiveSheet('dns')}>
+                Abrir teste de DNS
+              </button>
+            </>
+          )}
+          {complementaryTest === 'wifi' && (
+            <>
+              <p className="lk-result__next-test-text">Vale conferir sinais de Wi-Fi e histórico para confirmar se o problema é local.</p>
+              {onExplore && (
+                <button type="button" className="btn-text lk-result__next-test-btn" onClick={onExplore}>
+                  Abrir Ferramentas
+                </button>
+              )}
+            </>
+          )}
+          {complementaryTest === 'advanced' && (
+            <>
+              <p className="lk-result__next-test-text">Faça uma checagem avançada para confirmar estabilidade e variações da conexão.</p>
+              <button type="button" className="btn-text lk-result__next-test-btn" onClick={() => setActiveSheet('advanced')}>
+                Abrir Avançado
+              </button>
+            </>
           )}
         </div>
 
