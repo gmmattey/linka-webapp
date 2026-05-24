@@ -11,6 +11,7 @@
   - Mostrar contexto leigo do teste (tipo de conexao, horario e comparacao com historico da mesma conexao) para facilitar interpretacao de variacao.
   - Recomendar teste complementar direto a partir do diagnostico (DNS, Wi-Fi/Ferramentas ou Avancado), evitando menu solto.
   - Permitir foco por perfil de uso com chips leves (todos, jogos, streaming, trabalho, chamadas), destacando impacto pratico no perfil selecionado.
+  - Disponibilizar pacote de evidencia em dois formatos: resumo legivel para suporte e registro tecnico em JSON, ambos com aviso de evidencia circunstancial.
 - `HistoryScreen`: historico local com resumo, leitura de tendencia e rotulos em linguagem humana.
 - `ExploreScreen`: ajustes e recursos adicionais.
 - `DNSBenchmarkScreen`: comparacao de DNS.
