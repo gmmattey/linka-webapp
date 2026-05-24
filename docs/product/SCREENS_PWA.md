@@ -22,6 +22,7 @@
 - `FibraScreen`: explicacao e limitacoes de diagnostico de fibra no navegador.
 - `PulseScreen`: diagnostico guiado.
 - `OnboardingScreen`: primeira experiencia.
+- `OfflineScreen`: fallback dedicado para abertura sem internet, com orientacao leiga e atalho para historico offline.
 
 ## Regras
 
