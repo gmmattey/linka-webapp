@@ -791,6 +791,44 @@
   gap: 8px 16px;
 }
 
+.lk-result__share-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 12px;
+}
+
+.lk-result__share-card--technical {
+  background: var(--surface-deep);
+}
+
+.lk-result__share-card-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.lk-result__share-card-sub {
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-3);
+}
+
+.lk-result__share-card-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.lk-result__share-card-check input {
+  accent-color: var(--accent);
+}
+
 /* ── Combined Diagnosis ─────────────────────────────────────────────── */
 
 .lk-result__combined {
