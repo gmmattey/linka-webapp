@@ -6,6 +6,7 @@ import { usePulseDiagnosis } from './hooks/usePulseDiagnosis';
 import { RunningScreen } from './screens/RunningScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
+import { OfflineScreen } from './screens/OfflineScreen';
 import { BottomNavBar } from './components/BottomNavBar';
 import type { NavTab } from './components/BottomNavBar';
 import { PwaUpdatePrompt } from './components/PwaUpdatePrompt';
@@ -358,9 +359,19 @@ export default function App() {
   };
 
   const activeTab: NavTab | null = TAB_MAP[screen] ?? null;
-  const showNavBar = !HIDE_NAVBAR.includes(screen);
+  const showOfflineScreen = !isOnline && screen !== 'result' && screen !== 'historico';
+  const showNavBar = !HIDE_NAVBAR.includes(screen) && !showOfflineScreen;
 
   const view = useMemo(() => {
+    if (showOfflineScreen) {
+      return (
+        <OfflineScreen
+          onRetry={deviceInfo.reload}
+          onOpenHistory={handleShowHistory}
+        />
+      );
+    }
+
     switch (screen) {
       case 'velocidade':
         return (
@@ -488,7 +499,7 @@ export default function App() {
         );
     }
   }, [
-    screen, theme, onToggleTheme, isOnline,
+    screen, theme, onToggleTheme, isOnline, showOfflineScreen,
     test.phase, test.instantMbps, test.result, test.live, test.overallProgress,
     deviceInfo,
     previous, lastRecord, historyInitialId,
