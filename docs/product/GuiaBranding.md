@@ -26,17 +26,23 @@
 
 ## 2. Cores
 
+### Fonte única de verdade
+
+- Fonte normativa de tokens: `src/tokens.css`.
+- Quando houver divergência entre este guia e o código, prevalece `src/tokens.css`.
+- Este documento deve descrever intenção de uso e nomenclatura, evitando duplicar contratos numéricos completos.
+
 ### Paleta de tokens
 
 | Token | Valor dark | Valor light | Uso |
 |---|---|---|---|
-| `--accent` | `#6C2BFF` | `#6C2BFF` | CTAs, links, foco, anel do gauge, orb |
+| `--accent` | `#6C2BFF` | `#5B3FE8` | CTAs, links, foco, anel do gauge, orb |
 | `--accent-tint` | `rgba(108,43,255,0.12)` | `rgba(108,43,255,0.10)` | Fundo de ícones accent, badges |
-| `--dl` | `#3AB6FF` | `#0A84FF` | Download — todos os valores e ícones |
+| `--dl` | `#60A5FA` | `#2563EB` | Download — todos os valores e ícones |
 | `--dl-tint` | `rgba(58,182,255,0.12)` | `rgba(10,132,255,0.10)` | Fundo de ícone download |
-| `--ul` | `#22C55E` | `#30D158` | Upload — todos os valores e ícones |
+| `--ul` | `#34D399` | `#16A34A` | Upload — todos os valores e ícones |
 | `--ul-tint` | `rgba(34,197,94,0.12)` | `rgba(48,209,88,0.10)` | Fundo de ícone upload |
-| `--error` | `#FF453A` | `#FF3B30` | Falha, packetLoss alto, latência crítica |
+| `--error` | `#F87171` | `#DC2626` | Falha, packetLoss alto, latência crítica |
 | `--warn` | `#F5A623` | `#FF9F0A` | Aviso, jitter alto |
 | `--text` | `#F2F2F7` | `#1C1C1E` | Texto primário |
 | `--text-2` | `rgba(242,242,247,0.55)` | `rgba(28,28,30,0.55)` | Texto secundário |

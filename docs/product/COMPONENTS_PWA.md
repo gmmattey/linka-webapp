@@ -10,7 +10,7 @@
 
 | Componente | Arquivo | Propósito |
 | --- | --- | --- |
-| `BottomNavBar` | `BottomNavBar.tsx` | Barra navegação inferior (5 tabs: Início, Velocidade, Diagnóstico, Dispositivos, Ajustes) — v1.4.0 |
+| `BottomNavBar` | `BottomNavBar.tsx` | Barra navegação inferior (5 tabs: Início, Velocidade, Sinal, Histórico, Ajustes) — v1.4.0 |
 | `TopBar` | `TopBar.tsx` | Header superior com título + ações; suporta prop `opacity` para fade-on-scroll |
 | `BackButton` | `BackButton.tsx` | Botão voltar padrão |
 | `PageHeader` | `PageHeader.tsx` | Header páginas com breadcrumb/título |
@@ -75,7 +75,7 @@
 
 | Componente | Arquivo | Propósito |
 | --- | --- | --- |
-| `WifiContextCard` | `WifiContextCard.tsx` | Exibe contexto Wi-Fi capturado via Atalho iOS antes do teste; integrado em `App.tsx`, `ResultScreen.tsx` e `StartScreen.tsx` (v1.3.0) |
+| `WifiContextCard` | `WifiContextCard.tsx` | Exibe contexto Wi-Fi capturado via Atalho iOS antes do teste; integrado em `App.tsx` e `ResultScreen.tsx` (v1.3.0) |
 
 ---
 
@@ -132,6 +132,7 @@ DiagnosticScreen usa: ContextualQuestion, PageHeader
 FibraScreen usa: IOSList, Chip (para GPON status)
 
 SpeedTestScreen usa: Gauge, modos de speedtest
+OfflineScreen usa: fallback dedicado sem internet para PWA instalado
 ```
 
 ---
