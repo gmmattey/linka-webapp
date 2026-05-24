@@ -785,10 +785,55 @@
    é uma lista, não um destaque. */
 .lk-result__combined-list {
   list-style: none;
-  margin: 0;
+  margin: 8px 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
+}
+
+.lk-result__combined-primary {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-border);
+  background: var(--accent-tint);
+}
+
+.lk-result__combined-primary-kicker {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+
+.lk-result__combined-primary-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.lk-result__combined-primary-copy {
+  min-width: 0;
+}
+
+.lk-result__combined-primary-problem,
+.lk-result__combined-primary-action {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.lk-result__combined-primary-problem {
+  color: var(--text-2);
+}
+
+.lk-result__combined-primary-action {
+  margin-top: 2px;
+  color: var(--text);
+  font-weight: 600;
 }
 
 .lk-result__combined-item {

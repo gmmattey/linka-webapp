@@ -6,6 +6,7 @@
 - `SpeedTestScreen`: preparacao e inicio do teste, com o painel "Como o teste sera feito" explicando aparelho, rede atual e servidor externo em linguagem simples.
 - `RunningScreen`: progresso da medicao em linguagem humana, com etapa atual, percentual, duracao esperada e cancelamento explicito.
 - `ResultScreen`: resultado, diagnostico e detalhes.
+  - Diagnostico deve destacar uma recomendacao principal em "Prioridade agora" (motivo + proximo passo) e listar no maximo passos complementares abaixo.
 - `HistoryScreen`: historico local com resumo, leitura de tendencia e rotulos em linguagem humana.
 - `ExploreScreen`: ajustes e recursos adicionais.
 - `DNSBenchmarkScreen`: comparacao de DNS.
