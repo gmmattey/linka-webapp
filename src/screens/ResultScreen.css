@@ -528,6 +528,66 @@
   margin: 0;
 }
 
+/* ── Confianca da medicao (issue #12, 2026-05) ─────────────────────── */
+.lk-result__confidence {
+  margin: 0 16px 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+}
+
+.lk-result__confidence--high {
+  border-color: var(--color-good-border);
+  background: var(--color-good-bg);
+}
+
+.lk-result__confidence--medium {
+  border-color: var(--color-warn-border);
+  background: var(--color-warn-bg);
+}
+
+.lk-result__confidence--low {
+  border-color: var(--color-bad-border);
+  background: var(--color-bad-bg);
+}
+
+.lk-result__confidence-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.lk-result__confidence-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+
+.lk-result__confidence-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.lk-result__confidence-reason {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.lk-result__confidence-next {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+}
+
 /* ── Secondary details ───────────────────────────── */
 
 .lk-result__details {
