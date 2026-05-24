@@ -459,6 +459,34 @@
   font-style: italic;
 }
 
+.lk-result__context-insight {
+  margin: 2px 0 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.lk-result__context-insight-kicker {
+  margin: 0 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+
+.lk-result__context-insight-line {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.lk-result__context-insight-line + .lk-result__context-insight-line {
+  margin-top: 4px;
+}
+
 /* W5-A — Card RQUAL Anatel */
 .lk-result__rqual {
   margin: 0 16px 8px;

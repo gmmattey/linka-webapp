@@ -96,6 +96,26 @@ function ucLabel(id: UseCaseId): string {
   return resolveCopy(`useCase.${id}.label.short`);
 }
 
+function connectionTypeLabel(connectionType: ConnectionType | null | undefined): string {
+  if (connectionType === 'wifi') return 'Wi-Fi';
+  if (connectionType === 'mobile') return 'Rede móvel';
+  if (connectionType === 'cable') return 'Cabo';
+  return 'Conexão não identificada';
+}
+
+function periodOfDay(timestamp: number): 'morning' | 'afternoon' | 'night' {
+  const hour = new Date(timestamp).getHours();
+  if (hour >= 6 && hour < 12) return 'morning';
+  if (hour >= 12 && hour < 19) return 'afternoon';
+  return 'night';
+}
+
+function periodLabel(period: 'morning' | 'afternoon' | 'night'): string {
+  if (period === 'morning') return 'manhã';
+  if (period === 'afternoon') return 'tarde';
+  return 'noite';
+}
+
 function getUseCaseAlertReason(id: UseCaseId, factors: Array<'dl' | 'ul' | 'latency' | 'jitter' | 'packetLoss' | 'unknown'>): string {
   if (id === 'gaming') {
     if (factors.includes('packetLoss')) return 'Falhas na conexão podem causar quedas durante a partida.';
@@ -444,6 +464,27 @@ export function ResultScreen({
 
   const diagnosisItems = useDiagnosisItems(result, connectionType);
   const measurementConfidence = useMemo(() => evaluateMeasurementConfidence(result), [result]);
+  const contextInsight = useMemo(() => {
+    const sameConnection = history.filter((h) => h.connectionType === (connectionType ?? 'unknown'));
+    const avgDl = sameConnection.length > 0
+      ? sameConnection.reduce((acc, h) => acc + h.dl, 0) / sameConnection.length
+      : null;
+    const delta = avgDl != null ? result.dl - avgDl : null;
+    const avgBase = avgDl ?? 0;
+    const trendText = delta == null
+      ? 'Ainda não há histórico suficiente para comparar este cenário.'
+      : Math.abs(delta) <= Math.max(5, avgBase * 0.1)
+        ? 'Seu resultado ficou parecido com os testes anteriores nesta conexão.'
+        : delta > 0
+          ? 'Seu resultado ficou melhor que sua média recente nesta conexão.'
+          : 'Seu resultado ficou abaixo da sua média recente nesta conexão.';
+    const period = periodOfDay(result.timestamp);
+    return {
+      connection: connectionTypeLabel(connectionType),
+      period: periodLabel(period),
+      trendText,
+    };
+  }, [connectionType, history, result.dl, result.timestamp]);
 
   const unitLabel = unit === 'gbps' ? 'Gbps' : 'Mbps';
 
@@ -1061,6 +1102,14 @@ export function ResultScreen({
             barra colorida (verde/amarelo/vermelho) + %. A `WifiDetailsSheet`
             ao clicar continua mostrando os 4 dados completos. */}
         {connectionType === 'wifi' && <WifiSignalSection connectionType={connectionType} />}
+
+        <div className="lk-result__context-insight">
+          <p className="lk-result__context-insight-kicker">Contexto do teste</p>
+          <p className="lk-result__context-insight-line">
+            Conexão usada: <strong>{contextInsight.connection}</strong> · horário: <strong>{contextInsight.period}</strong>.
+          </p>
+          <p className="lk-result__context-insight-line">{contextInsight.trendText}</p>
+        </div>
         </section>
 
         {/* ── Diagnóstico da conexão (refator 2026-05) ────────────────────
