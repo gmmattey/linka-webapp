@@ -513,6 +513,8 @@ export function ResultScreen({
 
   const [shareStatus, setShareStatus] = useState<ShareStatus>('idle');
   const [focusUseCase, setFocusUseCase] = useState<FocusUseCase>('all');
+  const [includeContextInShare, setIncludeContextInShare] = useState(false);
+  const [includeSensitiveInTechnical, setIncludeSensitiveInTechnical] = useState(false);
   const [waGenerating, setWaGenerating] = useState(false);
   const [imgGenerating, setImgGenerating] = useState(false);
   const shareResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -526,10 +528,28 @@ export function ResultScreen({
   // sendo gerada pelo motor (`interpret.ts`) — só não é mais renderizada
   // como hero na tela de resultado (refactor visual 2026-05).
   const shareCardHeadline = resolveCopy(interpreted.copyKeys.headlineKey);
-  const shareCardIsp = server?.isp ?? null;
+  const shareCardIsp = includeContextInShare ? (server?.isp ?? null) : null;
+
+  const buildQuickShareText = useCallback(() => {
+    const lines = [
+      'Resultado LINKA SpeedTest',
+      `Download: ${formatMbps(result.dl)} Mbps`,
+      `Upload: ${result.ulFailed ? 'parcial/indisponível' : `${formatMbps(result.ul)} Mbps`}`,
+      `Latência: ${formatMs(result.latency)} ms`,
+      `Oscilação: ${formatMs(result.jitter)} ms`,
+      `Falhas: ${Math.round(result.packetLoss)}%`,
+    ];
+    if (includeContextInShare) {
+      lines.push(`Conexão: ${connectionTypeLabel(connectionType)}`);
+      if (server?.name) lines.push(`Servidor: ${server.name}`);
+    }
+    return lines.join('\n');
+  }, [connectionType, includeContextInShare, result.dl, result.jitter, result.latency, result.packetLoss, result.ul, result.ulFailed, server]);
 
   const handleShare = async () => {
-    const text = buildShareText(result, interpreted.primary, unit);
+    const text = includeContextInShare
+      ? buildShareText(result, interpreted.primary, unit)
+      : buildQuickShareText();
     const outcome = await shareResultText(text);
     if (outcome === 'copied') {
       setShareStatus('copied');
@@ -553,7 +573,9 @@ export function ResultScreen({
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: 'linka SpeedTest' });
       } else {
-        const text = buildShareText(result, interpreted.primary, unit);
+        const text = includeContextInShare
+          ? buildShareText(result, interpreted.primary, unit)
+          : buildQuickShareText();
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
       }
     } catch { /* cancelado */ }
@@ -655,6 +677,102 @@ export function ResultScreen({
   const handleNativeShare = useCallback(async () => {
     await handleShareImage();
   }, [handleShareImage]);
+
+  const downloadEvidenceFile = useCallback((filename: string, content: string, contentType: string) => {
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, []);
+
+  const handleDownloadSupportSummary = useCallback(() => {
+    const when = new Date(result.timestamp).toLocaleString('pt-BR');
+    const summary = [
+      'LINKA SpeedTest - Evidência resumida para suporte',
+      '',
+      `Data/hora: ${when}`,
+      `Download: ${formatMbps(result.dl)} Mbps`,
+      `Upload: ${result.ulFailed ? 'parcial/indisponível' : `${formatMbps(result.ul)} Mbps`}`,
+      `Latência: ${formatMs(result.latency)} ms`,
+      `Oscilação: ${formatMs(result.jitter)} ms`,
+      `Falhas: ${Math.round(result.packetLoss)}%${result.packetLossSource === 'estimated' ? ' (estimado)' : ''}`,
+      `Servidor: ${server?.name ?? 'não identificado'}`,
+      '',
+      'Observação: evidência circunstancial de medição no dispositivo do usuário.',
+      'Não constitui laudo técnico oficial.',
+    ].join('\n');
+    downloadEvidenceFile(`linka-evidencia-resumo-${result.timestamp}.txt`, summary, 'text/plain;charset=utf-8');
+  }, [downloadEvidenceFile, result, server?.name]);
+
+  const handleDownloadTechnicalRecord = useCallback(() => {
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      source: 'Linka WebApp PWA',
+      disclaimer: 'Evidência circunstancial. Não constitui laudo técnico oficial.',
+      result: {
+        timestamp: result.timestamp,
+        dlMbps: result.dl,
+        ulMbps: result.ul,
+        ulFailed: !!result.ulFailed,
+        latencyMs: result.latency,
+        jitterMs: result.jitter,
+        packetLossPct: result.packetLoss,
+        packetLossSource: result.packetLossSource ?? 'unknown',
+      },
+      context: includeSensitiveInTechnical
+        ? {
+            connectionType: connectionType ?? 'unknown',
+            server: server ? { id: server.id, name: server.name, loc: server.loc, isp: server.isp } : null,
+          }
+        : {
+            connectionType: connectionType ?? 'unknown',
+            server: null,
+          },
+    };
+    downloadEvidenceFile(
+      `linka-evidencia-tecnica-${result.timestamp}.json`,
+      JSON.stringify(payload, null, 2),
+      'application/json;charset=utf-8',
+    );
+  }, [connectionType, downloadEvidenceFile, includeSensitiveInTechnical, result, server]);
+
+  const handleExportTechnicalPdf = useCallback(() => {
+    const popup = window.open('', '_blank', 'noopener,noreferrer');
+    if (!popup) return;
+    const when = new Date(result.timestamp).toLocaleString('pt-BR');
+    const contextLine = includeSensitiveInTechnical
+      ? `${connectionTypeLabel(connectionType)} · ${server?.name ?? 'Servidor não identificado'}`
+      : `${connectionTypeLabel(connectionType)} · dados sensíveis ocultos`;
+    popup.document.write(`
+      <html><head><title>Evidencia Linka</title>
+      <style>
+        body{font-family:Arial,sans-serif;padding:24px;color:#111}
+        h1{font-size:20px;margin:0 0 4px}.muted{color:#555;font-size:12px}
+        .card{border:1px solid #ddd;border-radius:10px;padding:12px;margin-top:10px}
+        .row{margin:4px 0}
+      </style></head><body>
+      <h1>Pacote de evidência Linka</h1>
+      <p class="muted">Evidência circunstancial, não é laudo técnico oficial.</p>
+      <div class="card">
+        <div class="row"><strong>Data/hora:</strong> ${when}</div>
+        <div class="row"><strong>Download:</strong> ${formatMbps(result.dl)} Mbps</div>
+        <div class="row"><strong>Upload:</strong> ${result.ulFailed ? 'parcial/indisponível' : `${formatMbps(result.ul)} Mbps`}</div>
+        <div class="row"><strong>Latência:</strong> ${formatMs(result.latency)} ms</div>
+        <div class="row"><strong>Oscilação:</strong> ${formatMs(result.jitter)} ms</div>
+        <div class="row"><strong>Falhas:</strong> ${Math.round(result.packetLoss)}%</div>
+      </div>
+      <div class="card"><div class="row"><strong>Contexto:</strong> ${contextLine}</div></div>
+      </body></html>
+    `);
+    popup.document.close();
+    popup.focus();
+    popup.print();
+  }, [connectionType, includeSensitiveInTechnical, result, server?.name]);
 
   // Bloco 5 — TopBar System (2026-05): scroll listener para alternar
   // glass effect + título "Resultado do teste" no TopBar quando o usuário rola.
@@ -1385,24 +1503,57 @@ export function ResultScreen({
           <button className="btn-primary lk-result__retry" onClick={onRetry}>
             <Icon name="refresh" size={16} />Testar novamente
           </button>
-        <div className="lk-result__footer-row">
-          <button className="btn-text" onClick={handleWhatsApp} disabled={waGenerating}>
-            {waGenerating ? 'Gerando…' : 'WhatsApp'}
-          </button>
-          <button className="btn-text" onClick={handleShareImage} disabled={imgGenerating}>
-            {imgGenerating ? 'Gerando…' : 'Compartilhar imagem'}
-          </button>
-          <button className="btn-text" onClick={handleShare}>
-            {shareStatus === 'copied' ? 'Copiado!' : 'Compartilhar texto'}
-          </button>
-          <button className="btn-text" onClick={handleDownloadSupportSummary}>
-            Baixar resumo suporte
-          </button>
-          <button className="btn-text" onClick={handleDownloadTechnicalRecord}>
-            Baixar registro técnico
-          </button>
+          <div className="lk-result__share-card">
+            <p className="lk-result__share-card-title">Compartilhamento rápido</p>
+            <p className="lk-result__share-card-sub">
+              Versão curta para celular e conversa de suporte.
+            </p>
+            <label className="lk-result__share-card-check">
+              <input
+                type="checkbox"
+                checked={includeContextInShare}
+                onChange={(e) => setIncludeContextInShare(e.target.checked)}
+              />
+              Incluir contexto adicional (conexão e servidor)
+            </label>
+            <div className="lk-result__footer-row">
+              <button className="btn-text" onClick={handleWhatsApp} disabled={waGenerating}>
+                {waGenerating ? 'Gerando…' : 'WhatsApp'}
+              </button>
+              <button className="btn-text" onClick={handleShareImage} disabled={imgGenerating}>
+                {imgGenerating ? 'Gerando…' : 'Compartilhar imagem'}
+              </button>
+              <button className="btn-text" onClick={handleShare}>
+                {shareStatus === 'copied' ? 'Copiado!' : 'Compartilhar texto'}
+              </button>
+            </div>
+          </div>
+          <div className="lk-result__share-card lk-result__share-card--technical">
+            <p className="lk-result__share-card-title">Exportação técnica</p>
+            <p className="lk-result__share-card-sub">
+              Material para registro com aviso de evidência circunstancial.
+            </p>
+            <label className="lk-result__share-card-check">
+              <input
+                type="checkbox"
+                checked={includeSensitiveInTechnical}
+                onChange={(e) => setIncludeSensitiveInTechnical(e.target.checked)}
+              />
+              Incluir dados sensíveis (servidor/ISP)
+            </label>
+            <div className="lk-result__footer-row">
+              <button className="btn-text" onClick={handleDownloadSupportSummary}>
+                Baixar resumo suporte
+              </button>
+              <button className="btn-text" onClick={handleDownloadTechnicalRecord}>
+                Baixar JSON técnico
+              </button>
+              <button className="btn-text" onClick={handleExportTechnicalPdf}>
+                Exportar PDF
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
       </div>
 
       {/* Sheets de "Mais detalhes" (refator drag-to-resize 2026-05; lazy
