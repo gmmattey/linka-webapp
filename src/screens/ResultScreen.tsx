@@ -560,6 +560,69 @@ export function ResultScreen({
     finally { setWaGenerating(false); }
   };
 
+  const downloadEvidenceFile = useCallback((filename: string, content: string, contentType: string) => {
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, []);
+
+  const handleDownloadSupportSummary = useCallback(() => {
+    const when = new Date(result.timestamp).toLocaleString('pt-BR');
+    const summary = [
+      'LINKA SpeedTest - Evidência resumida para suporte',
+      '',
+      `Data/hora: ${when}`,
+      `Download: ${formatMbps(result.dl)} Mbps`,
+      `Upload: ${result.ulFailed ? 'parcial/indisponível' : `${formatMbps(result.ul)} Mbps`}`,
+      `Latência: ${formatMs(result.latency)} ms`,
+      `Oscilação: ${formatMs(result.jitter)} ms`,
+      `Falhas: ${Math.round(result.packetLoss)}%${result.packetLossSource === 'estimated' ? ' (estimado)' : ''}`,
+      `Servidor: ${server?.name ?? 'não identificado'} (${server?.loc ?? 'sem local'})`,
+      `Tipo de conexão: ${connectionTypeLabel(connectionType)}`,
+      '',
+      'Observação:',
+      'Este material é uma evidência circunstancial de medição no dispositivo do usuário,',
+      'com variação possível por horário, Wi-Fi e carga da rede. Não é laudo técnico oficial.',
+    ].join('\n');
+    downloadEvidenceFile(`linka-evidencia-resumo-${result.timestamp}.txt`, summary, 'text/plain;charset=utf-8');
+  }, [connectionType, downloadEvidenceFile, result, server]);
+
+  const handleDownloadTechnicalRecord = useCallback(() => {
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      source: 'Linka WebApp PWA',
+      disclaimer: 'Evidência circunstancial. Não constitui laudo técnico oficial.',
+      result: {
+        timestamp: result.timestamp,
+        dlMbps: result.dl,
+        ulMbps: result.ul,
+        ulFailed: !!result.ulFailed,
+        latencyMs: result.latency,
+        jitterMs: result.jitter,
+        packetLossPct: result.packetLoss,
+        packetLossSource: result.packetLossSource ?? 'unknown',
+        stabilityScore: result.stabilityScore ?? null,
+      },
+      context: {
+        connectionType: connectionType ?? 'unknown',
+        server: server
+          ? { id: server.id, name: server.name, colo: server.colo, loc: server.loc, isp: server.isp }
+          : null,
+      },
+    };
+    downloadEvidenceFile(
+      `linka-evidencia-tecnica-${result.timestamp}.json`,
+      JSON.stringify(payload, null, 2),
+      'application/json;charset=utf-8',
+    );
+  }, [connectionType, downloadEvidenceFile, result, server]);
+
   // Botão "Compartilhar imagem" do footer (Bloco 3 — Polimento, 2026-05).
   // Tenta Web Share API com `files`; se indisponível, dispara download
   // direto do PNG via objeto URL (fallback funcional sem perder a imagem).
@@ -1322,18 +1385,24 @@ export function ResultScreen({
           <button className="btn-primary lk-result__retry" onClick={onRetry}>
             <Icon name="refresh" size={16} />Testar novamente
           </button>
-          <div className="lk-result__footer-row">
-            <button className="btn-text" onClick={handleWhatsApp} disabled={waGenerating}>
-              {waGenerating ? 'Gerando…' : 'WhatsApp'}
-            </button>
-            <button className="btn-text" onClick={handleShareImage} disabled={imgGenerating}>
-              {imgGenerating ? 'Gerando…' : 'Compartilhar imagem'}
-            </button>
-            <button className="btn-text" onClick={handleShare}>
-              {shareStatus === 'copied' ? 'Copiado!' : 'Compartilhar texto'}
-            </button>
-          </div>
+        <div className="lk-result__footer-row">
+          <button className="btn-text" onClick={handleWhatsApp} disabled={waGenerating}>
+            {waGenerating ? 'Gerando…' : 'WhatsApp'}
+          </button>
+          <button className="btn-text" onClick={handleShareImage} disabled={imgGenerating}>
+            {imgGenerating ? 'Gerando…' : 'Compartilhar imagem'}
+          </button>
+          <button className="btn-text" onClick={handleShare}>
+            {shareStatus === 'copied' ? 'Copiado!' : 'Compartilhar texto'}
+          </button>
+          <button className="btn-text" onClick={handleDownloadSupportSummary}>
+            Baixar resumo suporte
+          </button>
+          <button className="btn-text" onClick={handleDownloadTechnicalRecord}>
+            Baixar registro técnico
+          </button>
         </div>
+      </div>
       </div>
 
       {/* Sheets de "Mais detalhes" (refator drag-to-resize 2026-05; lazy
