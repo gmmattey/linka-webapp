@@ -320,9 +320,10 @@ function DiagnosticActionList({
   style?: CSSProperties;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const visibleLimit = 3;
-  const visible = expanded ? items : items.slice(0, visibleLimit);
-  const remaining = items.length - visibleLimit;
+  const secondaryLimit = 2;
+  const primary = items[0] ?? null;
+  const secondaryItems = expanded ? items.slice(1) : items.slice(1, 1 + secondaryLimit);
+  const remaining = Math.max(0, items.length - (1 + secondaryLimit));
 
   const showFallback = items.length === 0;
 
@@ -341,23 +342,45 @@ function DiagnosticActionList({
       )}
 
       {!showFallback && (
-        <ul className="lk-result__combined-list" aria-label="Problemas e ações sugeridas">
-          {visible.map((item) => (
-            <li key={item.id} className={`lk-result__combined-item lk-result__combined-item--${item.severity}`}>
-              <div
-                className="lk-result__combined-item-icon"
-                style={{ background: SEVERITY_BG[item.severity], color: SEVERITY_COLOR[item.severity] }}
-              >
-                <Icon name={item.icon} size={14} />
+        <>
+          {primary && (
+            <div className="lk-result__combined-primary" aria-label="Recomendação principal">
+              <p className="lk-result__combined-primary-kicker">Prioridade agora</p>
+              <div className="lk-result__combined-primary-row">
+                <div
+                  className="lk-result__combined-item-icon"
+                  style={{ background: SEVERITY_BG[primary.severity], color: SEVERITY_COLOR[primary.severity] }}
+                >
+                  <Icon name={primary.icon} size={14} />
+                </div>
+                <div className="lk-result__combined-primary-copy">
+                  <p className="lk-result__combined-primary-problem">Motivo: {primary.problem}</p>
+                  <p className="lk-result__combined-primary-action">Próximo passo: {primary.action}</p>
+                </div>
               </div>
-              <div className="lk-result__combined-item-text">
-                <span className="lk-result__combined-item-problem">{item.problem}</span>
-                <span className="lk-result__combined-item-arrow" aria-hidden="true">→</span>
-                <span className="lk-result__combined-item-action">{item.action}</span>
-              </div>
-            </li>
-          ))}
-        </ul>
+            </div>
+          )}
+
+          {secondaryItems.length > 0 && (
+            <ul className="lk-result__combined-list" aria-label="Próximos passos sugeridos">
+              {secondaryItems.map((item) => (
+                <li key={item.id} className={`lk-result__combined-item lk-result__combined-item--${item.severity}`}>
+                  <div
+                    className="lk-result__combined-item-icon"
+                    style={{ background: SEVERITY_BG[item.severity], color: SEVERITY_COLOR[item.severity] }}
+                  >
+                    <Icon name={item.icon} size={14} />
+                  </div>
+                  <div className="lk-result__combined-item-text">
+                    <span className="lk-result__combined-item-problem">{item.problem}</span>
+                    <span className="lk-result__combined-item-arrow" aria-hidden="true">→</span>
+                    <span className="lk-result__combined-item-action">{item.action}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       )}
 
       {!showFallback && !expanded && remaining > 0 && (
