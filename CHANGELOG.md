@@ -2,6 +2,21 @@
 
 All notable changes to Linka WebApp are documented here.
 
+## [1.6.0] — 2026-05-26
+
+### Added
+- **Monitoramento foreground** (`useMonitor`): setInterval + Page Visibility API — pausa quando tab oculta
+- **Alertas in-app** (`MonitorAlert`): banner animado para status `warn` (>300ms), `error` (>600ms) e `offline`
+- Médias móveis de 3 amostras para evitar falsos positivos nos alertas
+- `SettingsScreen`: opção "Notificações em segundo plano" desabilitada com explicação clara
+- Nota explicativa: "Requer app nativo para monitoramento em background"
+
+### Changed
+- Monitoramento ativado via `settings.notificationsEnabled`; intervalo via `settings.checkInterval`
+
+### Closes
+- #52 — Monitoramento Contínuo e Alertas
+
 ## [1.5.0] — 2026-05-25
 
 ### Added

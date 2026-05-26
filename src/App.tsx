@@ -13,6 +13,8 @@ import { Skeleton } from './components/Skeleton';
 import { useDeviceInfo } from './hooks/useDeviceInfo';
 import { useSpeedTest } from './hooks/useSpeedTest';
 import { useSettings } from './hooks/useSettings';
+import { useMonitor } from './hooks/useMonitor';
+import { MonitorAlert } from './components/MonitorAlert';
 import { appendRecord, previousRecord, recordToResult } from './utils/history';
 import { performAppRefresh } from './utils/appRefresh';
 import {
@@ -99,6 +101,21 @@ export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(readInitialTheme);
   const [onboardingDone, setOnboardingDone] = useState<boolean>(readOnboardingDone);
   const { settings, update: updateSettings } = useSettings();
+  const [monitorDismissed, setMonitorDismissed] = useState(false);
+  const monitorAlert = useMonitor({
+    enabled: settings.notificationsEnabled,
+    checkIntervalMinutes: settings.checkInterval,
+  });
+  // Reabre o alerta quando o status muda (novo evento relevante)
+  const prevMonitorStatusRef = useRef(monitorAlert.status);
+  useEffect(() => {
+    if (monitorAlert.status !== prevMonitorStatusRef.current) {
+      prevMonitorStatusRef.current = monitorAlert.status;
+      if (monitorAlert.status === 'warn' || monitorAlert.status === 'error' || monitorAlert.status === 'offline') {
+        setMonitorDismissed(false);
+      }
+    }
+  }, [monitorAlert.status]);
   const [screen, setScreen] = useState<Screen>(() => previousRecord() ? 'result' : 'home');
   const [previous, setPrevious] = useState<TestRecord | null>(null);
   const [lastRecord, setLastRecord] = useState<TestRecord | null>(() => previousRecord());
@@ -490,6 +507,12 @@ export default function App() {
       <a className="lk-skip-link" href="#main-content">
         Pular para o conteúdo
       </a>
+      {!monitorDismissed && (
+        <MonitorAlert
+          alert={monitorAlert}
+          onDismiss={() => setMonitorDismissed(true)}
+        />
+      )}
       <div key={screen} className="screen-enter" id="main-content">
         <Suspense fallback={<ScreenLoadingFallback />}>{view}</Suspense>
       </div>

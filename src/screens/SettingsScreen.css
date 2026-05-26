@@ -1,5 +1,13 @@
 /* SettingsScreen — tokens do design system, sem hexcodes */
 
+.settings-push-note {
+  font-size: 11px;
+  color: var(--text-3);
+  margin: 4px 0 8px;
+  line-height: 1.5;
+  padding: 0 4px;
+}
+
 .settings-section-label {
   color: var(--text-2);
   margin: 8px 0 6px;
