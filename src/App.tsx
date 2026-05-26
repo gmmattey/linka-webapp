@@ -418,7 +418,6 @@ export default function App() {
             hideIpOnShare={settings.hideIpOnShare}
             gamingProfile={settings.gamingProfile}
             connectionType={deviceInfo.device?.connectionType ?? null}
-            onStartRoomTest={() => {}}
           />
         ) : null;
       }

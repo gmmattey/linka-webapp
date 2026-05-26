@@ -37,7 +37,9 @@ export function HomeScreen({
           <strong style={{ color: '#0f172a', fontSize: 22, lineHeight: 1.15 }}>Olá, Lucas</strong>
           <p style={{ margin: 0, color: '#64748b', fontSize: 12 }}>Tudo funcionando bem!</p>
         </div>
-        <Icon name="notifications" size={16} color="#64748b" />
+        <button type="button" aria-label="Notificações" onClick={() => alert('Notificações — em breve')} style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+          <Icon name="notifications" size={16} color="var(--text-2)" />
+        </button>
       </div>
 
       <StatusCard>

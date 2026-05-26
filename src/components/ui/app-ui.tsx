@@ -25,7 +25,7 @@ export function AppHeader({
       <div className="lk-ui-header__row">
         {showBack ? (
           <button type="button" className="lk-ui-header__back" aria-label="Voltar" onClick={onBack}>
-            <Icon name="chevron" size={14} color="#475569" />
+            <Icon name="chevron" size={14} color="var(--text-2)" />
           </button>
         ) : (
           <span className="lk-ui-header__slot" aria-hidden="true" />
@@ -53,7 +53,14 @@ export function SectionTitle({ title, right, compact = false }: { title: string;
   );
 }
 
-export function Badge({ text, tone = 'neutral' }: { text: string; tone?: 'neutral' | 'success' | 'error' | 'warn' | 'info' }) {
+export function Badge({ text, tone = 'neutral', onClick }: { text: string; tone?: 'neutral' | 'success' | 'error' | 'warn' | 'info'; onClick?: () => void }) {
+  if (onClick) {
+    return (
+      <button type="button" className={`lk-ui-badge lk-ui-badge--${tone}`} onClick={onClick}>
+        {text}
+      </button>
+    );
+  }
   return <span className={`lk-ui-badge lk-ui-badge--${tone}`}>{text}</span>;
 }
 
