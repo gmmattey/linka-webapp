@@ -20,7 +20,10 @@ export function HistoryScreen({ theme, unit, initialSelectedId, onBack, onRefres
     <AppScaffold>
       <AppHeader title="Histórico" />
       <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-        <Badge text="7 dias" tone="info" /><Badge text="30 dias" /><Badge text="90 dias" /><Badge text="Personalizado" />
+        <Badge text="7 dias" tone="info" onClick={() => alert('Filtrar 7 dias')} />
+        <Badge text="30 dias" onClick={() => alert('Filtrar 30 dias')} />
+        <Badge text="90 dias" onClick={() => alert('Filtrar 90 dias')} />
+        <Badge text="Personalizado" onClick={() => alert('Abrir seletor de período personalizado')} />
       </div>
 
       <ChartCard percent="99,2%" labels={uptimeLabels} values={uptimeData} />
@@ -32,7 +35,7 @@ export function HistoryScreen({ theme, unit, initialSelectedId, onBack, onRefres
           <div>
             <strong style={{ color: '#0f172a', fontSize: 14 }}>Sua rede está estável e saudável.</strong>
             <p style={{ margin: '5px 0', color: '#64748b', fontSize: 11, lineHeight: 1.45 }}>Excelente desempenho nos últimos 7 dias. Houve uma pequena instabilidade no dia 19/05, mas tudo voltou ao normal.</p>
-            <button type="button" style={{ color: 'var(--accent)', fontWeight: 600, fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <button type="button" style={{ color: 'var(--accent)', fontWeight: 600, fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4 }} onClick={() => alert('Abrir relatório completo')}>
               Ver relatório completo
               <Icon name="chevron" size={12} color="var(--accent)" />
             </button>
