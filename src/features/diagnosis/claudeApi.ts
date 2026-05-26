@@ -9,23 +9,7 @@
 import type { DiagnosisRecommendation, DiagnosisEngineInput, DiagnosisCause, Severity } from './types';
 import { rulesEngine } from './rulesEngine';
 import { withLocalDiagnosisFooter } from './fallback';
-
-const API_TIMEOUT_MS = 15000;
-const WORKER_URL = 'https://linka-ai-diagnosis-worker.giammattey-luiz.workers.dev/api/ai/diagnostico-conexao';
-
-interface WorkerResponse {
-  status?: string;
-  titulo?: string;
-  resumo?: string;
-  textoLaudo?: string;
-  problemaPrincipal?: { tipo?: string };
-  acoesRecomendadas?: Array<{
-    titulo?: string;
-    descricao?: string;
-    prioridade?: string;
-    tipo?: string;
-  }>;
-}
+import { checkDiagnosisWorkerAvailability, postDiagnosisWorker, type DiagnosisWorkerResponse } from './workerClient';
 
 function mapStatusToSeverity(status?: string): Severity {
   switch ((status ?? '').toLowerCase()) {
@@ -67,13 +51,9 @@ function mapPriority(priority?: string): 'high' | 'medium' | 'low' {
   }
 }
 
-async function callWorker(input: DiagnosisEngineInput): Promise<WorkerResponse> {
+async function callWorker(input: DiagnosisEngineInput): Promise<DiagnosisWorkerResponse> {
   const { testResult } = input;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
-
-  try {
-    const payload = {
+  return postDiagnosisWorker({
       schemaVersion: '3',
       generatedAtEpochMs: Date.now(),
       connectionType: testResult.connectionType,
@@ -88,39 +68,11 @@ async function callWorker(input: DiagnosisEngineInput): Promise<WorkerResponse> 
         modelo: testResult.deviceInfo?.model ?? null,
         sistema: testResult.deviceInfo?.os ?? null,
       },
-    };
-
-    const response = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
     });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Worker API error: ${response.status} - ${error}`);
-    }
-
-    return (await response.json()) as WorkerResponse;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`Worker API timeout (${API_TIMEOUT_MS}ms)`, { cause: error });
-    }
-    throw new Error('Falha ao chamar Worker API', { cause: error });
-  }
 }
 
 export async function checkDiagnosisAvailability(): Promise<boolean> {
-  try {
-    const response = await fetch(WORKER_URL, { method: 'HEAD' });
-    return response.ok || response.status === 405;
-  } catch {
-    return false;
-  }
+  return checkDiagnosisWorkerAvailability();
 }
 
 export async function cloudflareDiagnosis(
