@@ -156,8 +156,8 @@ export function ChartCard({ percent, labels, values }: { percent: string; labels
         <svg viewBox="0 0 100 100" className="lk-ui-chart" aria-hidden="true">
           <line x1="0" y1="0" x2="0" y2="100" className="lk-ui-axis" />
           <line x1="0" y1="100" x2="100" y2="100" className="lk-ui-axis" />
-          <polyline fill="none" stroke="#2F80ED" strokeWidth="1.7" points={points} />
-          <circle cx="83" cy="48" r="1.6" fill="#EF4444" />
+          <polyline fill="none" stroke="var(--accent)" strokeWidth="1.7" points={points} />
+          <circle cx="83" cy="48" r="1.6" fill="var(--error)" />
         </svg>
       </div>
       <div className="lk-ui-legend"><span><i className="online" />Online</span><span><i className="offline" />Offline</span></div>
