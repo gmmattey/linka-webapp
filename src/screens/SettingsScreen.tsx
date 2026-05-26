@@ -20,34 +20,32 @@ export function SettingsScreen({
   onResetOnboarding,
   onShowFibra,
 }: Props) {
-  void theme;
-  void onToggleTheme;
   void settings;
   void onUpdateSettings;
-  void onShowHistory;
-  void onResetOnboarding;
-  void onShowFibra;
 
   return (
     <AppScaffold>
       <AppHeader title="Ajustes" />
 
       <p style={{ color: '#64748b', margin: '2px 0 6px', fontSize: 12 }}>Perfil</p>
-      <SettingsRow title="Meu perfil" subtitle="Lucas Ferreira" icon="person" />
+      <SettingsRow title="Meu perfil" subtitle="Lucas Ferreira" icon="person" onClick={() => alert('Em breve: Edição de perfil')} />
 
       <p style={{ color: '#64748b', margin: '8px 0 6px', fontSize: 12 }}>Provedor</p>
-      <SettingsRow title="Provedor de internet" subtitle="Vivo Fibra 500" icon="business" />
+      <SettingsRow title="Provedor de internet" subtitle="Vivo Fibra 500" icon="business" onClick={onShowFibra} />
 
       <p style={{ color: '#64748b', margin: '8px 0 6px', fontSize: 12 }}>Tema</p>
-      <SettingsRow title="Aparência" subtitle="Claro" icon="sun" />
+      <SettingsRow title="Aparência" subtitle={theme === 'dark' ? 'Escuro' : 'Claro'} icon="sun" onClick={onToggleTheme} />
 
       <p style={{ color: '#64748b', margin: '8px 0 6px', fontSize: 12 }}>Monitoramento</p>
-      <SettingsRow title="Monitoramento contínuo" subtitle="Ativado" icon="history" />
-      <SettingsRow title="Intervalo de verificação" subtitle="1 minuto" icon="refresh" />
+      <SettingsRow title="Monitoramento contínuo" subtitle="Ativado" icon="history" onClick={onShowHistory} />
+      <SettingsRow title="Intervalo de verificação" subtitle="1 minuto" icon="refresh" onClick={() => alert('Em breve: Configurar intervalo')} />
 
       <p style={{ color: '#64748b', margin: '8px 0 6px', fontSize: 12 }}>Alertas</p>
-      <SettingsRow title="Notificações" subtitle="Ativadas" icon="notifications" />
-      <SettingsRow title="Alertas de queda" subtitle="Ativados" icon="loss" />
+      <SettingsRow title="Notificações" subtitle="Ativadas" icon="notifications" onClick={() => alert('Em breve: Configurar notificações')} />
+      <SettingsRow title="Alertas de queda" subtitle="Ativados" icon="loss" onClick={() => alert('Em breve: Alertas de queda')} />
+
+      <p style={{ color: '#64748b', margin: '8px 0 6px', fontSize: 12 }}>Avançado</p>
+      <SettingsRow title="Resetar Onboarding" subtitle="Ver tutorial novamente" icon="refresh" onClick={onResetOnboarding} />
     </AppScaffold>
   );
 }

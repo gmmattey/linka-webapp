@@ -80,9 +80,9 @@ export function StatusCard({ children }: { children: ReactNode }) {
   return <section className="lk-ui-card">{children}</section>;
 }
 
-export function SettingsRow({ title, subtitle, icon }: { title: string; subtitle: string; icon: string }) {
+export function SettingsRow({ title, subtitle, icon, onClick }: { title: string; subtitle: string; icon: string; onClick?: () => void }) {
   return (
-    <button className="lk-ui-row" type="button">
+    <button className="lk-ui-row" type="button" onClick={onClick}>
       <span className="lk-ui-row-icon"><Icon name={icon} size={14} color="var(--text-2)" /></span>
       <span className="lk-ui-row-copy"><strong>{title}</strong><small>{subtitle}</small></span>
       <Icon name="chevron" size={13} color="var(--text-3)" />
