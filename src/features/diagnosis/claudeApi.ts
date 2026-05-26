@@ -8,6 +8,7 @@
 
 import type { DiagnosisRecommendation, DiagnosisEngineInput, DiagnosisCause, Severity } from './types';
 import { rulesEngine } from './rulesEngine';
+import { withLocalDiagnosisFooter } from './fallback';
 
 const API_TIMEOUT_MS = 15000;
 const WORKER_URL = 'https://linka-ai-diagnosis-worker.giammattey-luiz.workers.dev/api/ai/diagnostico-conexao';
@@ -156,7 +157,12 @@ export async function cloudflareDiagnosis(
     console.warn('[cloudflareDiagnosis] Erro ao chamar Worker:', errorMsg);
 
     // Fallback para Rules Engine
-    return rulesEngine(input);
+    const fallback = rulesEngine(input);
+    return {
+      ...fallback,
+      source: 'fallback',
+      summary: withLocalDiagnosisFooter(fallback.summary),
+    };
   }
 }
 

@@ -1,6 +1,7 @@
 import type { AiAnalysisEntry } from './types';
 import type { SpeedTestResult } from '../../types';
 import { localAnalysisText, severityFromResult } from './rulesAdapter';
+import { withLocalDiagnosisFooter } from '../diagnosis/fallback';
 
 const WORKER_URL = 'https://linka-ai-diagnosis-worker.giammattey-luiz.workers.dev';
 const AI_TIMEOUT_MS = 15000;
@@ -66,7 +67,7 @@ export async function generateInitialAnalysis(
   } catch { /* fall through */ }
 
   const severity = severityFromResult(result);
-  const fallbackText = localAnalysisText(result, severity);
+  const fallbackText = withLocalDiagnosisFooter(localAnalysisText(result, severity));
   return { trigger, content: fallbackText, isFallback: true, timestamp: Date.now() };
 }
 
@@ -82,7 +83,7 @@ export function localFallback(result: SpeedTestResult): AiAnalysisEntry {
   const severity = severityFromResult(result);
   return {
     trigger: 'fallback',
-    content: localAnalysisText(result, severity),
+    content: withLocalDiagnosisFooter(localAnalysisText(result, severity)),
     isFallback: true,
     timestamp: Date.now(),
   };
