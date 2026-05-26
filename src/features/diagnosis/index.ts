@@ -3,7 +3,7 @@
  */
 
 export { rulesEngine } from './rulesEngine';
-export { claudeDiagnosis, combinedDiagnosis } from './claudeApi';
+export { cloudflareDiagnosis, claudeDiagnosis, combinedDiagnosis, checkDiagnosisAvailability } from './claudeApi';
 export { useDiagnosis } from './useDiagnosis';
 export { useDiagnosisItems } from './useDiagnosisItems';
 export { diagnosisRecommendationToItems, speedTestResultToEngineInput } from './diagnosisAdapter';

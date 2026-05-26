@@ -14,7 +14,7 @@ interface WorkerResponse {
   textoLaudo: string;
 }
 
-async function callWorker(trigger: string, context: string): Promise<string> {
+async function callWorker(trigger: string, context: string, result?: SpeedTestResult): Promise<string> {
   const ctrl = new AbortController();
   const timeoutId = setTimeout(() => ctrl.abort(), AI_TIMEOUT_MS);
 
@@ -23,6 +23,13 @@ async function callWorker(trigger: string, context: string): Promise<string> {
       schemaVersion: '3',
       generatedAtEpochMs: Date.now(),
       connectionType: 'unknown',
+      metricasAtuais: result ? {
+        downloadMbps: result.dl,
+        uploadMbps: result.ul,
+        latenciaMs: result.latency,
+        jitterMs: result.jitter,
+        perdaPacotesPercentual: result.packetLoss,
+      } : undefined,
       feedbackUsuario: context,
       evidencias: [
         { label: 'trigger', valor: trigger },
@@ -52,7 +59,7 @@ export async function generateInitialAnalysis(
   trigger: string,
 ): Promise<AiAnalysisEntry> {
   try {
-    const text = await callWorker(trigger, contextAccumulated);
+    const text = await callWorker(trigger, contextAccumulated, result);
     if (text) {
       return { trigger, content: text, isFallback: false, timestamp: Date.now() };
     }

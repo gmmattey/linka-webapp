@@ -113,7 +113,16 @@ async function callWorker(input: DiagnosisEngineInput): Promise<WorkerResponse> 
   }
 }
 
-export async function claudeDiagnosis(
+export async function checkDiagnosisAvailability(): Promise<boolean> {
+  try {
+    const response = await fetch(WORKER_URL, { method: 'HEAD' });
+    return response.ok || response.status === 405;
+  } catch {
+    return false;
+  }
+}
+
+export async function cloudflareDiagnosis(
   input: DiagnosisEngineInput,
 ): Promise<DiagnosisRecommendation> {
   const startTime = Date.now();
@@ -154,5 +163,8 @@ export async function claudeDiagnosis(
 export async function combinedDiagnosis(
   input: DiagnosisEngineInput,
 ): Promise<DiagnosisRecommendation> {
-  return claudeDiagnosis(input);
+  return cloudflareDiagnosis(input);
 }
+
+// Alias legado para evitar quebra de import durante migração.
+export const claudeDiagnosis = cloudflareDiagnosis;
