@@ -56,7 +56,6 @@ interface Props {
    * a entrada do app", deixando a header do resultado mais limpa.
    */
   onBack: () => void;
-  onStartRoomTest?: () => void;
   unit?: 'mbps' | 'gbps';
   hideIpOnShare?: boolean;
   gamingProfile?: GamingProfile;
