@@ -11,16 +11,25 @@ const baseResult: SpeedTestResult = {
   timestamp: new Date('2026-04-28T14:32:00-03:00').getTime(),
 };
 
+function testNavigator(): Record<string, unknown> {
+  const g = globalThis as unknown as { navigator?: Record<string, unknown> };
+  if (typeof g.navigator !== 'object' || g.navigator == null) {
+    g.navigator = {} as Record<string, unknown>;
+  }
+  return g.navigator;
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
-  Reflect.deleteProperty(navigator, 'share');
-  Reflect.deleteProperty(navigator, 'clipboard');
+  const nav = testNavigator();
+  Reflect.deleteProperty(nav, 'share');
+  Reflect.deleteProperty(nav, 'clipboard');
 });
 
 describe('share result', () => {
   it('usa navigator.share quando disponível e envia title + text corretos', async () => {
     const mockShare = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, 'share', { value: mockShare, configurable: true });
+    Object.defineProperty(testNavigator(), 'share', { value: mockShare, configurable: true });
 
     const text = buildShareText(baseResult, 'good', 'mbps');
     const outcome = await shareResultText(text);
@@ -39,7 +48,7 @@ describe('share result', () => {
 
   it('chama clipboard.writeText quando navigator.share não existe', async () => {
     const mockWriteText = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, 'clipboard', {
+    Object.defineProperty(testNavigator(), 'clipboard', {
       value: { writeText: mockWriteText },
       configurable: true,
     });
@@ -54,7 +63,7 @@ describe('share result', () => {
 
   it('não lança quando navigator.share rejeita', async () => {
     const mockShare = vi.fn().mockRejectedValue(new Error('cancelled'));
-    Object.defineProperty(navigator, 'share', { value: mockShare, configurable: true });
+    Object.defineProperty(testNavigator(), 'share', { value: mockShare, configurable: true });
 
     const text = buildShareText(baseResult, 'good', 'mbps');
 
@@ -63,7 +72,7 @@ describe('share result', () => {
 
   it('não lança quando clipboard falha', async () => {
     const mockWriteText = vi.fn().mockRejectedValue(new Error('no permission'));
-    Object.defineProperty(navigator, 'clipboard', {
+    Object.defineProperty(testNavigator(), 'clipboard', {
       value: { writeText: mockWriteText },
       configurable: true,
     });
