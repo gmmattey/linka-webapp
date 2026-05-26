@@ -118,11 +118,20 @@ export function SettingsScreen({
 
       <p className="settings-section-label">Alertas</p>
       <SettingsRow
-        title="Notificações in-app"
+        title="Alertas de conexão (in-app)"
         subtitle={notifLabel}
         icon="notifications"
         onClick={toggleNotifications}
       />
+      <SettingsRow
+        title="Notificações em segundo plano"
+        subtitle="Requer app nativo"
+        icon="loss"
+        onClick={() => {/* disabled — sem backend de push */}}
+      />
+      <p className="settings-push-note">
+        Alertas em segundo plano requerem app nativo instalado. No browser, monitoramento funciona apenas com o app aberto.
+      </p>
 
       <p className="settings-section-label">Avançado</p>
       <SettingsRow
