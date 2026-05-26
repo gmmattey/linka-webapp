@@ -23,6 +23,14 @@ Este repositorio nao contem shell nativo, plugins nativos, projeto Android ou em
 - `src/features/local-network`: estado indisponivel/fallback para descoberta de rede local no navegador.
 - `src/screens`: composicao de telas.
 
+## Diagnostico IA (canônico)
+
+- Endpoint remoto canônico: `POST https://linka-ai-diagnosis-worker.giammattey-luiz.workers.dev/api/ai/diagnostico-conexao`.
+- Fluxos que usam o endpoint: diagnostico principal (`useDiagnosis`) e diagnostico conversacional (`Pulse`).
+- Disponibilidade: `HEAD` no mesmo endpoint (considerar `200` e `405` como servidor ativo, alinhado ao Android).
+- Fallback: em timeout/erro HTTP/parse, o WebApp retorna analise local e identifica explicitamente:
+  `Motor de análise: Diagnóstico local do Linka`.
+
 ## Capacidades Web
 
 O navegador nao expoe RSSI, canal Wi-Fi, ARP, MAC, varredura LAN, GPON/ONU ou medicao UDP real de packet loss.
