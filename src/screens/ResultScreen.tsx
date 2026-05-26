@@ -576,102 +576,6 @@ export function ResultScreen({
     popup.print();
   }, [connectionType, includeSensitiveInTechnical, result, server?.name]);
 
-  const downloadEvidenceFile = useCallback((filename: string, content: string, contentType: string) => {
-    const blob = new Blob([content], { type: contentType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, []);
-
-  const handleDownloadSupportSummary = useCallback(() => {
-    const when = new Date(result.timestamp).toLocaleString('pt-BR');
-    const summary = [
-      'LINKA SpeedTest - Evidência resumida para suporte',
-      '',
-      `Data/hora: ${when}`,
-      `Download: ${formatMbps(result.dl)} Mbps`,
-      `Upload: ${result.ulFailed ? 'parcial/indisponível' : `${formatMbps(result.ul)} Mbps`}`,
-      `Latência: ${formatMs(result.latency)} ms`,
-      `Oscilação: ${formatMs(result.jitter)} ms`,
-      `Falhas: ${Math.round(result.packetLoss)}%${result.packetLossSource === 'estimated' ? ' (estimado)' : ''}`,
-      `Servidor: ${server?.name ?? 'não identificado'}`,
-      '',
-      'Observação: evidência circunstancial de medição no dispositivo do usuário.',
-      'Não constitui laudo técnico oficial.',
-    ].join('\n');
-    downloadEvidenceFile(`linka-evidencia-resumo-${result.timestamp}.txt`, summary, 'text/plain;charset=utf-8');
-  }, [downloadEvidenceFile, result, server?.name]);
-
-  const handleDownloadTechnicalRecord = useCallback(() => {
-    const payload = {
-      generatedAt: new Date().toISOString(),
-      source: 'Linka WebApp PWA',
-      disclaimer: 'Evidência circunstancial. Não constitui laudo técnico oficial.',
-      result: {
-        timestamp: result.timestamp,
-        dlMbps: result.dl,
-        ulMbps: result.ul,
-        ulFailed: !!result.ulFailed,
-        latencyMs: result.latency,
-        jitterMs: result.jitter,
-        packetLossPct: result.packetLoss,
-        packetLossSource: result.packetLossSource ?? 'unknown',
-      },
-      context: includeSensitiveInTechnical
-        ? {
-            connectionType: connectionType ?? 'unknown',
-            server: server ? { id: server.id, name: server.name, loc: server.loc, isp: server.isp } : null,
-          }
-        : {
-            connectionType: connectionType ?? 'unknown',
-            server: null,
-          },
-    };
-    downloadEvidenceFile(
-      `linka-evidencia-tecnica-${result.timestamp}.json`,
-      JSON.stringify(payload, null, 2),
-      'application/json;charset=utf-8',
-    );
-  }, [connectionType, downloadEvidenceFile, includeSensitiveInTechnical, result, server]);
-
-  const handleExportTechnicalPdf = useCallback(() => {
-    const popup = window.open('', '_blank', 'noopener,noreferrer');
-    if (!popup) return;
-    const when = new Date(result.timestamp).toLocaleString('pt-BR');
-    const contextLine = includeSensitiveInTechnical
-      ? `${connectionTypeLabel(connectionType)} · ${server?.name ?? 'Servidor não identificado'}`
-      : `${connectionTypeLabel(connectionType)} · dados sensíveis ocultos`;
-    popup.document.write(`
-      <html><head><title>Evidencia Linka</title>
-      <style>
-        body{font-family:Arial,sans-serif;padding:24px;color:#111}
-        h1{font-size:20px;margin:0 0 4px}.muted{color:#555;font-size:12px}
-        .card{border:1px solid #ddd;border-radius:10px;padding:12px;margin-top:10px}
-        .row{margin:4px 0}
-      </style></head><body>
-      <h1>Pacote de evidência Linka</h1>
-      <p class="muted">Evidência circunstancial, não é laudo técnico oficial.</p>
-      <div class="card">
-        <div class="row"><strong>Data/hora:</strong> ${when}</div>
-        <div class="row"><strong>Download:</strong> ${formatMbps(result.dl)} Mbps</div>
-        <div class="row"><strong>Upload:</strong> ${result.ulFailed ? 'parcial/indisponível' : `${formatMbps(result.ul)} Mbps`}</div>
-        <div class="row"><strong>Latência:</strong> ${formatMs(result.latency)} ms</div>
-        <div class="row"><strong>Oscilação:</strong> ${formatMs(result.jitter)} ms</div>
-        <div class="row"><strong>Falhas:</strong> ${Math.round(result.packetLoss)}%</div>
-      </div>
-      <div class="card"><div class="row"><strong>Contexto:</strong> ${contextLine}</div></div>
-      </body></html>
-    `);
-    popup.document.close();
-    popup.focus();
-    popup.print();
-  }, [connectionType, includeSensitiveInTechnical, result, server?.name]);
-
   // Bloco 5 — TopBar System (2026-05): scroll listener para alternar
   // glass effect + título "Resultado do teste" no TopBar quando o usuário rola.
   // Padronização Large Title (2026-05, frente B): o sentinel agora é o
@@ -1307,6 +1211,7 @@ export function ResultScreen({
 //   - Modo Gamer → src/features/result-detail/GamerSheet.tsx
 //   - DNS        → src/features/dns/DNSGuideSheet.tsx (já existia)
 // =============================================================================
+
 
 
 

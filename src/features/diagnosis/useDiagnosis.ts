@@ -21,7 +21,7 @@ export interface UseDiagnosisResult {
   data: DiagnosisRecommendation | null;
   loading: boolean;
   error: string | null;
-  source: 'rules-engine' | 'claude-api' | 'fallback' | null;
+  source: 'rules-engine' | 'claude-api' | 'cloudflare-ai' | 'fallback' | null;
 }
 
 /**

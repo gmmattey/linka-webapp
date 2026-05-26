@@ -5,12 +5,11 @@ import { localAnalysisText, severityFromResult } from './rulesAdapter';
 const WORKER_URL = 'https://linka-ai-diagnosis-worker.giammattey-luiz.workers.dev';
 const AI_TIMEOUT_MS = 15000;
 
-interface WorkerRequest {
-  context: string;
-  trigger: string;
-}
-
 interface WorkerResponse {
+  modeloIa?: {
+    nomeExibicao?: string;
+    textoRodape?: string;
+  };
   resumo: string;
   textoLaudo: string;
 }
@@ -20,8 +19,16 @@ async function callWorker(trigger: string, context: string): Promise<string> {
   const timeoutId = setTimeout(() => ctrl.abort(), AI_TIMEOUT_MS);
 
   try {
-    const body: WorkerRequest = { context, trigger };
-    const res = await fetch(`${WORKER_URL}/pulse`, {
+    const body = {
+      schemaVersion: '3',
+      generatedAtEpochMs: Date.now(),
+      connectionType: 'unknown',
+      feedbackUsuario: context,
+      evidencias: [
+        { label: 'trigger', valor: trigger },
+      ],
+    };
+    const res = await fetch(`${WORKER_URL}/api/ai/diagnostico-conexao`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -30,7 +37,9 @@ async function callWorker(trigger: string, context: string): Promise<string> {
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error(`Worker error ${res.status}`);
     const data = (await res.json()) as WorkerResponse;
-    return (data.resumo || data.textoLaudo || '').trim();
+    const mainText = (data.textoLaudo || data.resumo || '').trim();
+    const footer = data.modeloIa?.textoRodape?.trim();
+    return footer ? `${mainText}\n\n${footer}` : mainText;
   } catch {
     clearTimeout(timeoutId);
     throw new Error('Worker unavailable');
