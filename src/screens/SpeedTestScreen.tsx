@@ -22,7 +22,11 @@ export function SpeedTestScreen({ onStart, lastRecord }: Props) {
     <AppScaffold>
       <AppHeader
         title="Teste de velocidade"
-        rightAction={<Icon name="info" size={16} color="#475569" />}
+        rightAction={
+          <button type="button" onClick={() => alert('Em breve: Informações sobre o teste')} aria-label="Informações" style={{ background: 'transparent', border: 'none', padding: 4 }}>
+            <Icon name="info" size={16} color="#475569" />
+          </button>
+        }
       />
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
@@ -49,10 +53,10 @@ export function SpeedTestScreen({ onStart, lastRecord }: Props) {
 
       <SectionTitle title="Ferramentas" compact />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
-        <QuickActionCard icon="ping" label="Ping" />
-        <QuickActionCard icon="cmp" label="Traceroute" />
-        <QuickActionCard icon="globe" label="DNS Lookup" />
-        <QuickActionCard icon="network" label="Port Scan" />
+        <QuickActionCard icon="ping" label="Ping" onClick={() => alert('Em breve: Ping')} />
+        <QuickActionCard icon="cmp" label="Traceroute" onClick={() => alert('Em breve: Traceroute')} />
+        <QuickActionCard icon="globe" label="DNS Lookup" onClick={() => alert('Em breve: DNS Lookup')} />
+        <QuickActionCard icon="network" label="Port Scan" onClick={() => alert('Em breve: Port Scan')} />
       </div>
 
       <button type="button" className="btn-text" style={{ width: '100%', marginTop: 6, fontWeight: 600 }} onClick={() => onStart('fast')}>
