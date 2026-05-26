@@ -47,4 +47,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=${{ secrets.CLOUDFLARE_PAGES_PROJECT || 'linka-webapp' }} --branch=main
+          command: pages deploy dist --project-name=${{ secrets.CLOUDFLARE_PAGES_PROJECT || 'linka-speedtest' }} --branch=main

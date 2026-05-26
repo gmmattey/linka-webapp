@@ -34,7 +34,7 @@ Depois publica `dist/` no Cloudflare Pages.
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
-- `CLOUDFLARE_PAGES_PROJECT`
+- `CLOUDFLARE_PAGES_PROJECT` (opcional; default do workflow: `linka-speedtest`)
 
 ## Fora de Escopo
 
