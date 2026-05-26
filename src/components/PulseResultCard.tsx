@@ -17,7 +17,7 @@ export function PulseResultCard({ analysis }: Props) {
       <div className="pulse-result-card__header">
         <span className="pulse-result-card__label">
           ✦ Análise IA
-          {analysis.isFallback && <span className="pulse-result-card__fallback">local</span>}
+          {analysis.isFallback && <span className="pulse-result-card__fallback">Diagnóstico local do Linka</span>}
         </span>
         <span className="pulse-result-card__toggle">{expanded ? '▲' : '▼'}</span>
       </div>
