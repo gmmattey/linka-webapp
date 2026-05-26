@@ -1,8 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PulseScreen } from './screens/PulseScreen';
+import { AiScreen } from './screens/AiScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { SpeedTestScreen } from './screens/SpeedTestScreen';
-import { usePulseDiagnosis } from './hooks/usePulseDiagnosis';
 import { RunningScreen } from './screens/RunningScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
@@ -16,7 +15,6 @@ import { useSpeedTest } from './hooks/useSpeedTest';
 import { useSettings } from './hooks/useSettings';
 import { appendRecord, previousRecord, recordToResult } from './utils/history';
 import { performAppRefresh } from './utils/appRefresh';
-import { getCapabilities } from './platform/capabilities';
 import {
   parseWifiCallback,
   savePendingWifiContext,
@@ -25,10 +23,9 @@ import {
 import type { TestRecord, WifiContext } from './types';
 
 // Code splitting: telas secundárias vão em chunks separados via React.lazy.
-// HomeScreen/RunningScreen/ResultScreen/HistoryScreen permanecem eager —
-// são o caminho principal do app. PulseScreen/OrbitScreen também eager.
-const ExploreScreen = lazy(() =>
-  import('./screens/ExploreScreen').then((m) => ({ default: m.ExploreScreen })),
+// HomeScreen/RunningScreen/ResultScreen/HistoryScreen permanecem eager.
+const SettingsScreen = lazy(() =>
+  import('./screens/SettingsScreen').then((m) => ({ default: m.SettingsScreen })),
 );
 const LocalWifiScreen = lazy(() =>
   import('./features/local-wifi/LocalWifiScreen').then((m) => ({ default: m.LocalWifiScreen })),
@@ -65,15 +62,14 @@ const TAB_MAP: Partial<Record<Screen, NavTab>> = {
   home:         'home',
   velocidade:   'velocidade',
   historico:    'historico',
-  orbit:        'home',
   sinal:        'sinal',
-  dispositivos: 'sinal',
+  dispositivos: 'home',
   fibra:        'ajustes',
   ajustes:      'ajustes',
 };
 
 // Telas em que o BottomNavBar fica oculto (fluxo de teste)
-const HIDE_NAVBAR: Screen[] = ['running', 'result'];
+const HIDE_NAVBAR: Screen[] = ['running', 'result', 'orbit'];
 
 const THEME_KEY = 'linka.speedtest.theme';
 const ONBOARDING_KEY = 'linka.onboarding.done';
@@ -85,7 +81,7 @@ function readInitialTheme(): 'dark' | 'light' {
     const v = localStorage.getItem(THEME_KEY);
     if (v === 'light' || v === 'dark') return v;
   } catch { /* ignore */ }
-  return 'dark';
+  return 'light';
 }
 
 function readOnboardingDone(): boolean {
@@ -306,15 +302,12 @@ export default function App() {
   const handleOpenOrbit = useCallback(() => goTo('orbit'), [goTo]);
   const handleShowSinal = useCallback(() => goTo('sinal'), [goTo]);
   // goTo('dispositivos') available via TAB_MAP navigation
-  const handleOpenAjustes = useCallback(() => goTo('ajustes'), [goTo]);
   const handleShowFibra = useCallback(() => goTo('fibra'), [goTo]);
 
   const goToReturnTarget = useCallback(() => {
     forwardStackRef.current = [];
     setScreen('home');
   }, []);
-
-  const pulse = usePulseDiagnosis(deviceInfo.device?.connectionType ?? 'unknown');
 
   const handleOnboardingComplete = useCallback(() => {
     try { localStorage.setItem(ONBOARDING_KEY, '1'); } catch { /* ignore */ }
@@ -330,7 +323,6 @@ export default function App() {
     [deviceInfo.reload],
   );
 
-  const capabilities = useMemo(() => getCapabilities(), []);
 
   // ── Swipe lateral (back/forward) ─────────────────────────
   const swipeStartRef = useRef<{ x: number; y: number; valid: boolean } | null>(null);
@@ -421,24 +413,18 @@ export default function App() {
             server={serverForResult}
             previous={previous}
             onRetry={handleRetry}
-            onBack={() => goTo('home')}
+            onBack={() => goTo('velocidade')}
             unit={settings.unit}
             hideIpOnShare={settings.hideIpOnShare}
             gamingProfile={settings.gamingProfile}
             connectionType={deviceInfo.device?.connectionType ?? null}
-            contractedDown={settings.contractedDown}
-            contractedUp={settings.contractedUp}
-            onUpdateContracted={(down, up) => updateSettings({ contractedDown: down, contractedUp: up })}
-            useHaptics={settings.useHaptics}
-            onToggleHaptics={(next) => updateSettings({ useHaptics: next })}
             onStartRoomTest={() => {}}
-            onExplore={handleOpenAjustes}
           />
         ) : null;
       }
       case 'ajustes':
         return (
-          <ExploreScreen
+          <SettingsScreen
             theme={theme}
             onToggleTheme={onToggleTheme}
             settings={settings}
@@ -451,21 +437,11 @@ export default function App() {
       case 'sinal':
         return <LocalWifiScreen onBack={goBack} onOpenDevices={() => goTo('dispositivos')} />;
       case 'dispositivos':
-        return <LocalNetworkScreen onBack={goBack} />;
+        return <LocalNetworkScreen onBack={() => goTo('home')} />;
       case 'fibra':
         return <FibraScreen onBack={goBack} />;
       case 'orbit':
-        return (
-          <PulseScreen
-            phase={pulse.phase}
-            mensagem={pulse.mensagem}
-            error={pulse.error}
-            session={pulse.session}
-            onIniciar={pulse.iniciar}
-            onSelecionarChip={pulse.selecionarChip}
-            onResponderPergunta={pulse.responderPergunta}
-          />
-        );
+        return <AiScreen onOpenSpeed={() => handleNavTab('velocidade')} />;
       case 'historico':
         return (
           <HistoryScreen
@@ -491,9 +467,9 @@ export default function App() {
             lastRecord={lastRecord}
             onShowHistory={handleShowHistory}
             onNavigateToSpeedTest={() => handleNavTab('velocidade')}
-            onNavigateToAjustes={() => handleNavTab('ajustes')}
             onOpenOrbit={handleOpenOrbit}
-            onShowSinal={capabilities.localWifiDiagnostics ? handleShowSinal : undefined}
+            onShowSinal={handleShowSinal}
+            onShowDevices={() => goTo('dispositivos')}
             onRefresh={handleAppRefresh}
           />
         );
@@ -504,11 +480,9 @@ export default function App() {
     deviceInfo,
     previous, lastRecord, historyInitialId,
     handleStart, handleCancel, handleRetry, handleShowHistory, handleNavTab,
-    handleOpenOrbit, handleShowSinal, handleOpenAjustes, handleShowFibra,
-    pulse,
+    handleOpenOrbit, handleShowSinal, handleShowFibra,
     handleAppRefresh, handleResetOnboarding,
     goBack, goTo, goToReturnTarget,
-    capabilities.localWifiDiagnostics,
     settings, updateSettings, testMode, testCancelledNotice,
   ]);
 

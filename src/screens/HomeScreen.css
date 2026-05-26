@@ -48,9 +48,9 @@
   padding: calc(var(--safe-top) + 64px) 16px 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: 16px;
   /* extra bottom pad because BottomNavBar covers ~60px + safe area */
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ── Network Path ─────────────────────────────────────────────────── */
@@ -60,6 +60,7 @@
   align-items: center;
   justify-content: center;
   gap: 0;
+  padding: 0;
 }
 
 .lk-home__node {
@@ -131,13 +132,18 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  padding: 16px;
+  padding: 18px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 10px 24px rgba(13, 30, 56, 0.08);
 }
 
 .lk-home__intro-title {
   margin: 0;
   font-family: var(--font-display);
   font-size: 18px;
+  letter-spacing: 0;
   font-weight: 700;
   line-height: 1.2;
   color: var(--text);
@@ -146,6 +152,7 @@
 .lk-home__intro-body {
   margin: 4px 0 0;
   font-size: 13px;
+  letter-spacing: 0;
   line-height: 1.45;
   color: var(--text-2);
 }
@@ -192,7 +199,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(13, 30, 56, 0.08);
 }
 
 .lk-home__medicoes-header {
@@ -624,7 +632,7 @@
 
 .lk-home__hero-big {
   font-family: var(--font-display);
-  font-size: 30px;
+  font-size: 34px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -651,7 +659,8 @@
 /* ── ExperienciaDeUso card wrapper ───────────────────────────────────── */
 
 .lk-home__exp-card {
-  padding: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(13, 30, 56, 0.08);
 }
 
 /* ── SignalCard ──────────────────────────────────────────────────────── */
@@ -660,7 +669,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 18px;
   text-align: left;
   width: 100%;
   background: none;
@@ -755,7 +764,7 @@ div.lk-home__signal-card {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px;
+  padding: 18px;
   width: 100%;
   text-align: left;
   background: none;

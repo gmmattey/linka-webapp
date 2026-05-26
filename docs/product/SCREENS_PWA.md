@@ -2,6 +2,10 @@
 
 ## Mapa
 
+- `BottomNavBar` fixa em todas as telas principais: `Inicio`, `Velocidade`, `Sinal`, `Historico`, `Ajustes`.
+- `Dispositivos` permanece como tela principal navegavel via atalho da Home e via fluxo interno de `Sinal`.
+- Referencia visual oficial para as telas principais: mockup `linka-webapp.png` (Home, Velocidade, Sinal, Dispositivos, Historico e Ajustes).
+
 - `HomeScreen`: entrada, proposta de valor, consumo por modo, ultimo resultado e atalhos.
 - `SpeedTestScreen`: preparacao e inicio do teste, com o painel "Como o teste sera feito" explicando aparelho, rede atual e servidor externo em linguagem simples.
 - `RunningScreen`: progresso da medicao em linguagem humana, com etapa atual, percentual, duracao esperada e cancelamento explicito.
@@ -14,7 +18,7 @@
   - Disponibilizar pacote de evidencia em dois formatos: resumo legivel para suporte e registro tecnico em JSON, ambos com aviso de evidencia circunstancial.
   - Organizar compartilhamento em card vertical separado entre rapido e tecnico/PDF, com dados sensiveis ocultos por padrao.
 - `HistoryScreen`: historico local com resumo, leitura de tendencia e rotulos em linguagem humana.
-- `ExploreScreen`: ajustes e recursos adicionais.
+- `SettingsScreen`: ajustes e recursos adicionais.
 - `DNSBenchmarkScreen`: comparacao de DNS.
 - `DNSGuideScreen`: orientacao para DNS.
 - `LocalWifiScreen`: diagnostico Wi-Fi com fallback web.

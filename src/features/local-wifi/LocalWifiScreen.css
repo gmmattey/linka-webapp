@@ -12,7 +12,8 @@
 .lk-local-wifi__scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 0 16px 32px;
+  padding: 0 16px calc(96px + env(safe-area-inset-bottom, 0px));
+  background: radial-gradient(circle at 50% 10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 44%);
 }
 
 .lk-local-wifi__scroll > .lk-page-header {
@@ -25,13 +26,14 @@
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  background: var(--surface-deep);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-card);
   padding: var(--space-lg);
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  box-shadow: 0 10px 24px rgba(13, 30, 56, 0.08);
 }
 
 .lk-local-wifi__title {
@@ -145,17 +147,20 @@
 /* Tab Row — MD3 style */
 .lk-local-wifi__tabs {
   display: flex;
-  border-bottom: 1px solid var(--border);
-  margin: 0 -16px var(--space-lg);
-  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  margin: 0 auto var(--space-lg);
+  padding: 3px;
+  max-width: 420px;
 }
 
 .lk-local-wifi__tab {
   flex: 1;
-  padding: 11px 16px;
+  padding: 10px 16px;
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-radius: 999px;
   color: var(--text-3);
   font-family: var(--font-body);
   font-size: 14px;
@@ -166,8 +171,8 @@
 }
 
 .lk-local-wifi__tab--active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  color: #fff;
+  background: var(--accent);
 }
 
 /* Browser fallback content */
@@ -198,7 +203,7 @@
 
 .lk-local-wifi__list--browser {
   width: 100%;
-  background: var(--surface);
+  background: var(--surface-2);
   border-radius: var(--radius-sm, 8px);
   padding: var(--space-sm) var(--space-md);
 }

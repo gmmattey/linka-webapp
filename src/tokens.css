@@ -131,20 +131,20 @@
 }
 
 [data-theme='light'] {
-  --bg:                   #FAFAF7;
+  --bg:                   #F8FAFC;
   /* Bloco 3 — Polimento (2026-05): mesma ideia em light: centro um toque
      mais claro que as bordas para dar respiro sem afetar legibilidade.
      Recalibração 2026-05 (terceira passada): mesmo motivo do dark — edge
      antigo `#F2F1EC` (~11 pts por canal abaixo do centro `#FDFDFB`)
      produzia step visual contra `--surface-deep` (`#FBFBFD`) dos cards.
      Edge agora = `--bg` (`#FAFAF7`), ~3 pts por canal abaixo do centro. */
-  --bg-radial:            radial-gradient(120vmax 120vmax at 50% 30%, #FDFDFB 0%, #FAFAF7 100%);
+  --bg-radial:            radial-gradient(120vmax 120vmax at 50% 24%, #FFFFFF 0%, #F3F6FB 100%);
   --bg-elev:              #FFFFFF;
   --surface:              #FFFFFF;
   /* Bloco visual (2026-05): em light, --surface-deep é uma tonalidade
      ligeiramente off-white, ainda lendo como "card" mas distinta do
      --surface puro branco. Mantém paridade conceitual com o token dark. */
-  --surface-deep:         #FBFBFD;
+  --surface-deep:         #FFFFFF;
   --surface-2:            #F3F2EE;
   --surface-3:            #ECEAE4;
   --surface-translucent:  rgba(255, 255, 255, 0.78);
@@ -152,12 +152,12 @@
   --border-strong:        #D8D5CC;
   --border-subtle:        #F0EEE8;
   --hairline:             rgba(0, 0, 0, 0.06);
-  --accent:               #5B3FE8;
-  --accent-soft:          #7C6BF0;
-  --accent-tint:          rgba(91, 63, 232, 0.08);
-  --accent-tint-strong:   rgba(91, 63, 232, 0.25);
-  --accent-border:        rgba(91, 63, 232, 0.25);
-  --accent-glow:          rgba(91, 63, 232, 0.50);
+  --accent:               #2F80ED;
+  --accent-soft:          #42A5F5;
+  --accent-tint:          rgba(30, 136, 229, 0.10);
+  --accent-tint-strong:   rgba(30, 136, 229, 0.22);
+  --accent-border:        rgba(30, 136, 229, 0.22);
+  --accent-glow:          rgba(30, 136, 229, 0.34);
   --orbit-bg:             #0D0D1A;
   --orbit-surface:        #1A0B2E;
   --orbit-card:           #1E1130;
@@ -273,6 +273,21 @@ body {
      residual), o #root garante que o tema continue. Sem gradiente —
      gradient já está no body e duplicar criaria banding. */
   background-color: var(--bg);
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  border-left: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  box-shadow: 0 16px 40px rgba(10, 30, 60, 0.10);
+}
+
+@media (max-width: 480px) {
+  #root {
+    max-width: none;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+  }
 }
 
 button {
@@ -303,7 +318,7 @@ a {
   background: var(--surface-deep);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--card-shadow);
 }
 
@@ -312,13 +327,13 @@ a {
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  height: 52px;
+  height: 46px;
   padding: 0 var(--space-xl);
   background: var(--accent);
   color: #FFFFFF;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   border-radius: var(--radius-button);
   transition: background var(--transition-fast);
 }
@@ -332,13 +347,13 @@ a {
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  height: 48px;
+  height: 44px;
   padding: 0 var(--space-xl);
   background: transparent;
   color: var(--accent);
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   border: 1px solid var(--accent);
   border-radius: var(--radius-button);
   transition: background var(--transition-fast);
@@ -352,12 +367,12 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
+  height: 36px;
   padding: 0 var(--space-md);
   color: var(--accent);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .label {
@@ -441,3 +456,4 @@ a {
 .lk-skip-link:focus {
   transform: translateY(0);
 }
+

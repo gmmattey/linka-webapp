@@ -117,6 +117,62 @@
   margin-bottom: 14px;
 }
 
+.lk-result__diag-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px 10px;
+}
+
+.lk-result__diag-summary-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--color-good-bg);
+  border: 1px solid var(--color-good-border);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.lk-result__diag-summary-copy {
+  min-width: 0;
+}
+
+.lk-result__diag-summary-title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--text);
+}
+
+.lk-result__diag-summary-text {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.lk-result__diag-tags {
+  padding: 0 16px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lk-result__diag-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--success);
+  background: var(--color-good-bg);
+  border: 1px solid var(--color-good-border);
+}
+
 /* ── Bloco PRIMARY — Download e Upload em fonte enorme ─────────────────
    Hierarquia visual nova (2026-05): as duas métricas principais (banda)
    ficam com peso máximo. Sem badge de grade por métrica — as grades
@@ -125,8 +181,8 @@
 .lk-result__primary-block {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 20px;
+  gap: 10px;
+  padding: 14px 16px;
   /* Refactor 2026-05 (card unificado): este bloco vive dentro de
      `.lk-result__test-card`. Background/border/radius/margin saíram para
      o container externo. Como é o PRIMEIRO filho do card, NÃO ganha
@@ -152,35 +208,16 @@
 .lk-result__primary-cell-value {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 56px;
+  font-size: 44px;
   line-height: 1;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
-  color: var(--text);
-}
-
-/* ── Glow nos hero numbers (pacote premium 2026-05) ──────────────────────
-   Override explícito do reset universal `* { text-shadow: none !important
-   }` em tokens.css. Usa `!important` (única forma de bater outro
-   `!important`) — confinado SOMENTE a Download/Upload do bloco PRIMARY
-   da ResultScreen. Cor herda do próprio --dl/--ul via tokens dedicados
-   `--dl-glow` / `--ul-glow` (alpha ~0.30-0.40). Blur 16px.
-
-   Cores Anatel (2026-05): quando o usuário cadastrou plano contratado,
-   a ResultScreen seta `--cell-glow` inline na própria `.primary-cell-value`
-   (ver helper `anatelGradeGlowVar`) — verde/amarelo/vermelho-glow conforme
-   % de entrega. O fallback `var(--cell-glow, var(--dl-glow))` mantém o
-   azul/verde de marca quando o plano não está cadastrado. */
-.lk-result__primary-cell:nth-child(1) .lk-result__primary-cell-value {
-  text-shadow: 0 0 20px var(--cell-glow, var(--phase-dl-glow)) !important;
-}
-.lk-result__primary-cell:nth-child(2) .lk-result__primary-cell-value {
-  text-shadow: 0 0 20px var(--cell-glow, var(--phase-ul-glow)) !important;
+  color: #0f172a;
 }
 
 .lk-result__primary-cell-unit {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-2);
 }
 
@@ -224,7 +261,7 @@
 
 @media (min-width: 600px) {
   .lk-result__primary-cell-value {
-    font-size: 72px;
+    font-size: 56px;
   }
 }
 
@@ -248,8 +285,8 @@
      o value font foi reduzido de 14→13px e a label é encurtada para
      compensar o aperto. Em ≥600px o value volta a 15px (regra abaixo). */
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  padding: 12px 16px;
+  gap: 8px;
+  padding: 10px 16px 14px;
   /* Refactor 2026-05 (card unificado): bg/border/radius/margin saíram —
      este bloco vive dentro de `.lk-result__test-card`. Hairline
      `border-top` separa visualmente da seção PRIMARY acima. */
