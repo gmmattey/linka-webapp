@@ -57,6 +57,43 @@ Quando o usuario pedir tratativa continua de issues do GitHub:
 
 Se algum passo nao puder ser executado, reportar explicitamente o bloqueio e nao fingir conclusao.
 
+## Enforcement do Fluxo (Obrigatorio)
+
+Estas regras prevalecem para qualquer trabalho com issue/PR e devem ser tratadas como bloqueio duro:
+
+1. Proibido commit direto em `main` quando o trabalho estiver vinculado a issue.
+2. Proibido tratar mais de uma issue por vez.
+3. Obrigatorio usar branch `codex/<id-ou-tema-curto>` para cada issue.
+4. Obrigatorio abrir PR para `main` antes de qualquer merge.
+5. Merge em `main` somente com autorizacao explicita do usuario na conversa atual.
+6. Se qualquer regra acima for violada, o agente deve:
+   - parar imediatamente novas alteracoes;
+   - reportar o desvio com clareza;
+   - propor plano de correcao sem perda;
+   - aguardar confirmacao do usuario antes de continuar.
+
+### Checklist Obrigatorio Antes de Codar
+
+Antes de editar arquivos, o agente deve informar:
+
+- issue alvo (ID e titulo);
+- branch atual;
+- estado do git (`clean` ou `dirty`);
+- proximo passo imediato.
+
+Sem esse checklist, a execucao deve ser pausada.
+
+### Evidencias Obrigatorias na Entrega
+
+Ao finalizar cada issue, o agente deve reportar explicitamente:
+
+- issue;
+- branch;
+- PR;
+- commit(s);
+- saida/situacao de `npm run lint`, `npm test`, `npm run build`;
+- status da comunicacao no Slack `#linka-webapp` (ou bloqueio concreto).
+
 ## Validacao Minima
 
 ```bash
