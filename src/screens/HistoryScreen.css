@@ -13,6 +13,7 @@
   overflow-y: auto;
   overscroll-behavior-y: contain;
   padding: calc(var(--safe-top, 0px) + 64px) 16px calc(env(safe-area-inset-bottom, 0px) + 80px);
+  background: radial-gradient(circle at 50% 10%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 45%);
 }
 
 .lk-history__scroll > .lk-page-header {
@@ -23,7 +24,7 @@
 .lk-history__content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 /* ── Resumo ──────────────────────────────────────────────────────── */
@@ -33,10 +34,11 @@
   flex-direction: column;
   gap: 14px;
   padding: 16px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
   border: 1px solid var(--border);
   border-left: 3px solid var(--text-3);
   border-radius: var(--radius-card);
+  box-shadow: 0 10px 24px rgba(13, 30, 56, 0.08);
 }
 
 .lk-history__summary--good { border-left-color: var(--success); }
@@ -83,7 +85,8 @@
   min-width: 0;
   padding: 10px 8px;
   border-radius: var(--radius-card);
-  background: var(--surface-2);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  border: 1px solid var(--border-subtle);
 }
 
 .lk-history__summary-grid span {
@@ -133,10 +136,11 @@
   flex-direction: column;
   gap: 4px;
   padding: 16px 14px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
   border: 1px solid var(--border);
   border-left: 3px solid var(--text-3);
   border-radius: var(--radius-card);
+  box-shadow: 0 10px 24px rgba(13, 30, 56, 0.08);
 }
 
 .lk-history__trend--good    { border-left-color: var(--success); }
@@ -167,15 +171,16 @@
   flex-direction: column;
   gap: 7px;
   width: 100%;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  padding: 14px 16px;
+  padding: 16px;
   cursor: pointer;
   text-align: left;
   font-family: var(--font-body);
   -webkit-tap-highlight-color: transparent;
   transition: background 150ms ease-out;
+  box-shadow: 0 8px 20px rgba(13, 30, 56, 0.06);
 }
 
 .lk-hist-card:active {

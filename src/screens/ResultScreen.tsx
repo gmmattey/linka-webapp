@@ -2,14 +2,13 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import type { CSSProperties } from 'react';
 import { IOSList } from '../components/IOSList';
 import { Icon, ConnectionIcon } from '../components/icons';
-import { HamburgerMenu, HamburgerMenuIcon } from '../components/HamburgerMenu';
 import { TopBar } from '../components/TopBar';
 import { PageHeader } from '../components/PageHeader';
 import { useScrollHeader } from '../hooks/useScrollHeader';
 import { generateShareCard } from '../utils/shareCard';
 import { buildShareText, shareResultText } from '../utils/share';
 import type { Quality, ServerInfo, SpeedTestResult, TestRecord } from '../types';
-import { interpretSpeedTestResult, resolveCopy, useCaseGrade as computeUseCaseGrade, type UseCaseGrade } from '../core';
+import { interpretSpeedTestResult, resolveCopy } from '../core';
 import { useDiagnosisItems } from '../features/diagnosis';
 import { InfoTooltip } from '../components/InfoTooltip';
 import type { UseCaseId } from '../core';
@@ -21,7 +20,6 @@ import type { ConnectionType, GamingProfile } from '../types';
 import './ResultScreen.css';
 import { combineDiagnostics } from '../utils/combinedDiagnosis';
 import { toConnectionProfile } from '../utils/connectionProfile';
-import { anatelGrade, anatelGradeColorVar, anatelGradeGlowVar } from '../utils/anatelColor';
 import { classifyDnsLatency } from '../utils/dnsTiming';
 import { aggregateDiagnosisSeverity, type DiagnosisAggregate, type DiagnosisItem } from '../utils/diagnosisItems';
 import { evaluateMeasurementConfidence } from '../utils/measurementConfidence';
@@ -58,25 +56,11 @@ interface Props {
    * a entrada do app", deixando a header do resultado mais limpa.
    */
   onBack: () => void;
-  /**
-   * Refator 2026-05: Diagnóstico, Recomendações, Detalhes e Modo Gamer
-   * deixaram de ser navegação. Diagnóstico virou o card unificado da
-   * ResultScreen (com 2 estados); os demais viraram accordions na seção
-   * "Mais detalhes". Apenas `onExplore` (link para a tela "Explorar")
-   * sobrevive como navegação.
-   */
-  onExplore?: () => void;
   onStartRoomTest?: () => void;
   unit?: 'mbps' | 'gbps';
   hideIpOnShare?: boolean;
   gamingProfile?: GamingProfile;
   connectionType?: ConnectionType | null;
-  contractedDown?: number | null;
-  contractedUp?: number | null;
-  onUpdateContracted?: (down: number | null, up: number | null) => void;
-  // Bloco 3 (Polimento, 2026-05): toggle de haptics no HamburgerMenu.
-  useHaptics?: boolean;
-  onToggleHaptics?: (next: boolean) => void;
 }
 
 type ShareStatus = 'idle' | 'copied';
@@ -142,32 +126,6 @@ function getUseCaseAlertReason(id: UseCaseId, factors: Array<'dl' | 'ul' | 'late
 }
 
 // =============================================================================
-// Grade A-F — estilo + label
-// =============================================================================
-// Migrado de "por métrica" para "por use case" no refactor visual de 2026-05.
-// As cores vêm das CSS vars `--grade-a..f`; o background segue a paleta
-// good/warn/bad já estabelecida.
-
-function gradeLabel(g: UseCaseGrade): string {
-  const map: Record<UseCaseGrade, string> = {
-    A: 'Excelente',
-    B: 'Bom',
-    C: 'Regular',
-    D: 'Ruim',
-    F: 'Crítico',
-  };
-  return map[g];
-}
-
-function gradeStyle(g: UseCaseGrade): { background: string; color: string } {
-  const lower = g.toLowerCase() as 'a' | 'b' | 'c' | 'd' | 'f';
-  const bg = (g === 'A' || g === 'B') ? 'var(--color-good-bg)'
-           : g === 'C' ? 'var(--color-warn-bg)'
-           : 'var(--color-bad-bg)';
-  return { background: bg, color: `var(--grade-${lower})` };
-}
-
-// =============================================================================
 // Verdict label (pacote premium 2026-05, refatorado 2026-05) — mapping de
 // Quality → texto curto. Texto continua sendo necessário para `aria-label`
 // e `sr-only` do card unificado (chip flutuante foi removido — verdict
@@ -178,94 +136,6 @@ function gradeStyle(g: UseCaseGrade): { background: string; color: string } {
 function verdictLabel(q: Quality): string {
   return resolveCopy(`quality.${q}.headline`);
 }
-
-// =============================================================================
-// W5-A — RQUAL Anatel: estados aprovado/parcial/reprovado (Wave 5, 2026-05).
-// =============================================================================
-// Baseado no Ato 7869/2022 (fixa) / Resolução 717/2019:
-//   aprovado  → >= 80% da velocidade contratada
-//   parcial   → >= 40% mas < 80%
-//   reprovado → < 40%
-// "Hora de pico" NÃO existe normativamente — não é usado aqui.
-// =============================================================================
-
-type RqualStatus = 'aprovado' | 'parcial' | 'reprovado' | null;
-
-/** Avalia uma única métrica contra seu contratado. Retorna null se dados ausentes. */
-function rqualSingleStatus(deliveredMbps: number, contractedMbps: number | null | undefined): RqualStatus {
-  if (contractedMbps == null || contractedMbps <= 0) return null;
-  if (!isFinite(deliveredMbps) || deliveredMbps <= 0) return null;
-  const pct = (deliveredMbps / contractedMbps) * 100;
-  if (pct >= 80) return 'aprovado';
-  if (pct >= 40) return 'parcial';
-  return 'reprovado';
-}
-
-/**
- * Retorna o pior status entre download e upload, conforme Ato 7869/2022.
- * Se contractedUp não estiver disponível, avalia só download (não inventa valor).
- * Upload com `ulFailed=true` é ignorado no cálculo para não punir falha de medição.
- */
-function rqualStatus(
-  dlMbps: number,
-  contractedDown: number | null | undefined,
-  ulMbps: number | null,
-  contractedUp: number | null | undefined,
-  ulFailed?: boolean,
-): RqualStatus {
-  const dlStatus = rqualSingleStatus(dlMbps, contractedDown);
-  if (dlStatus === null) return null; // sem contratado, sem card
-
-  // Upload só entra no cálculo se: contratado informado E medição válida
-  const ulStatus =
-    !ulFailed && ulMbps != null
-      ? rqualSingleStatus(ulMbps, contractedUp)
-      : null;
-
-  // Pior dos dois (null = não avaliado, não contribui)
-  const order: Record<NonNullable<RqualStatus>, number> = {
-    aprovado: 0,
-    parcial: 1,
-    reprovado: 2,
-  };
-  if (ulStatus === null) return dlStatus;
-  return order[dlStatus] >= order[ulStatus] ? dlStatus : ulStatus;
-}
-
-function rqualConclusion(status: RqualStatus): string {
-  if (status === 'aprovado') return 'Sua internet está dentro do esperado pelo contrato.';
-  if (status === 'parcial')  return 'Velocidade acima do mínimo, mas abaixo do normal. Pode ser variação pontual — faça mais testes para confirmar.';
-  if (status === 'reprovado') return 'Se isso se repetir, você tem direito de reclamar com sua operadora.';
-  return '';
-}
-
-function rqualColor(status: RqualStatus): string {
-  if (status === 'aprovado') return 'var(--success)';
-  if (status === 'parcial')  return 'var(--warn)';
-  return 'var(--error)';
-}
-
-function rqualBgColor(status: RqualStatus): string {
-  if (status === 'aprovado') return 'var(--color-good-bg)';
-  if (status === 'parcial')  return 'var(--color-warn-bg)';
-  return 'var(--color-bad-bg)';
-}
-
-function rqualLabel(status: RqualStatus): string {
-  if (status === 'aprovado') return 'Dentro do contrato';
-  if (status === 'parcial')  return 'Abaixo do normal';
-  return 'Abaixo do mínimo';
-}
-
-// Tooltip RQUAL com 3 parágrafos educativos (paridade Android — Wave 5).
-// InfoTooltip aceita ReactNode desde a extensão de Risco 2 (2026-05).
-const RQUAL_TOOLTIP = (
-  <>
-    <span>A ANATEL define dois limites de velocidade que sua operadora é obrigada a cumprir.</span>
-    <span>O mínimo garantido é 40% da velocidade que você contratou — em qualquer momento do dia. Este teste mede exatamente isso.</span>
-    <span>O limite de velocidade normal é 80% da velocidade contratada. Esse cálculo usa uma média de vários testes ao longo do tempo — não é possível confirmar esse critério com uma única medição.</span>
-  </>
-);
 
 // =============================================================================
 // Ribbon do card unificado de teste (refactor 2026-05).
@@ -282,20 +152,20 @@ function qualityRibbonColor(q: Quality): string {
   return 'var(--error)';
 }
 
-function qualityToGradeLetter(q: Quality): string {
-  if (q === 'excellent') return 'A';
-  if (q === 'good') return 'B';
-  if (q === 'fair') return 'C';
-  if (q === 'slow') return 'D';
-  return '?';
+function diagnosticTitle(q: Quality): string {
+  if (q === 'excellent' || q === 'good') return 'Conexão excelente';
+  if (q === 'fair') return 'Conexão adequada';
+  return 'Conexão com instabilidade';
 }
 
-function qualityToGradeCircleStyle(q: Quality): { background: string; color: string } {
-  if (q === 'excellent') return { background: 'var(--color-good-bg)', color: 'var(--grade-a)' };
-  if (q === 'good')      return { background: 'var(--color-good-bg)', color: 'var(--grade-b)' };
-  if (q === 'fair')      return { background: 'var(--color-warn-bg)', color: 'var(--grade-c)' };
-  if (q === 'slow')      return { background: 'var(--color-bad-bg)',  color: 'var(--grade-d)' };
-  return { background: 'var(--surface-2)', color: 'var(--text-3)' };
+function diagnosticSummary(q: Quality): string {
+  if (q === 'excellent' || q === 'good') {
+    return 'Sua conexão está adequada para jogos, streaming, videochamadas e home office.';
+  }
+  if (q === 'fair') {
+    return 'Sua conexão atende tarefas do dia a dia, mas pode oscilar em usos intensivos.';
+  }
+  return 'Sua conexão apresentou limitações para usos mais sensíveis.';
 }
 
 // =============================================================================
@@ -441,11 +311,11 @@ export function ResultScreen({
   result,
   server,
   onRetry, onBack,
-  onExplore,
   unit = 'mbps',
-  connectionType, contractedDown = null, contractedUp = null, onUpdateContracted,
-  useHaptics, onToggleHaptics,
+  connectionType,
 }: Props) {
+  void theme;
+  void onToggleTheme;
   const history = useMemo(() => loadHistory(), []);
   const profile = useMemo(
     () => toConnectionProfile(connectionType ?? undefined),
@@ -610,11 +480,6 @@ export function ResultScreen({
     finally { setImgGenerating(false); }
   }, [result, interpreted.primary, unit, shareCardHeadline, shareCardIsp, imgGenerating]);
 
-  // Mantido para o HamburgerMenu (mesmo fluxo do botão de imagem).
-  const handleNativeShare = useCallback(async () => {
-    await handleShareImage();
-  }, [handleShareImage]);
-
   const downloadEvidenceFile = useCallback((filename: string, content: string, contentType: string) => {
     const blob = new Blob([content], { type: contentType });
     const url = URL.createObjectURL(blob);
@@ -719,10 +584,6 @@ export function ResultScreen({
   // existia no slot anterior.
   const { scrolled, topBarOpacity, scrollContainerRef, sentinelRef } = useScrollHeader();
 
-  // Bloco 6 — UX uniforme (2026-05): HamburgerMenu agora é controlled;
-  // o trigger é um IconButton no rightActions do TopBar.
-  const [menuOpen, setMenuOpen] = useState(false);
-
   // Refator 2026-05 (drag-to-resize): a seção "Mais detalhes" virou 3
   // rows clicáveis (Avançado / Modo Gamer / DNS). Cada uma abre um
   // bottom sheet dedicado (AdvancedSheet, GamerSheet, DNSGuideSheet).
@@ -743,25 +604,6 @@ export function ResultScreen({
         opacity={topBarOpacity}
         title="Resultado do teste"
         showTitle={scrolled}
-        useHaptics={useHaptics ?? false}
-        rightActions={[{
-          icon: <HamburgerMenuIcon />,
-          onClick: () => setMenuOpen((o) => !o),
-          ariaLabel: 'Menu',
-        }]}
-      />
-      <HamburgerMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        theme={theme}
-        onToggleTheme={onToggleTheme}
-        onShare={handleNativeShare}
-        contractedDown={contractedDown}
-        contractedUp={contractedUp}
-        onUpdateContracted={onUpdateContracted ?? (() => {})}
-        showContracted={connectionType !== 'mobile'}
-        useHaptics={useHaptics}
-        onToggleHaptics={onToggleHaptics}
       />
 
       <div className="lk-result__scroll" ref={scrollContainerRef}>
@@ -786,12 +628,7 @@ export function ResultScreen({
         {(() => {
           const parts: string[] = [];
           if (server?.name) parts.push(server.name);
-          if (server?.loc && server.loc !== '—') parts.push(server.loc);
           if (server?.isp && server.isp !== '—') parts.push(server.isp);
-          // DNS feature (2026-05, Fase B): peça DNS no banner — "DNS
-          // Cloudflare", "DNS Google", ou "DNS do provedor" (fallback do
-          // identificador). Some quando o probe falhou (provider null).
-          if (result.dnsProvider) parts.push(`Serviços de Internet: ${result.dnsProvider}`);
           const rel = formatRelativeTime(result.timestamp);
           if (rel) parts.push(rel);
           // Sem peças, sem banner. Verdict não é mais chip aqui — é ribbon
@@ -868,20 +705,23 @@ export function ResultScreen({
         >
           <span className="sr-only">Verdict: {verdictLabel(interpreted.primary)}</span>
 
-        {/* ── Grade circle (alinhamento Kotlin: ResultadoVelocidadeScreen) ── */}
-        {(() => {
-          const circleStyle = qualityToGradeCircleStyle(interpreted.primary);
-          return (
-            <div className="lk-result__grade-row">
-              <div className="lk-result__grade-circle" style={{ background: circleStyle.background }}>
-                <span className="lk-result__grade-letter" style={{ color: circleStyle.color }}>
-                  {qualityToGradeLetter(interpreted.primary)}
-                </span>
-              </div>
-              <p className="lk-result__grade-verdict">{verdictLabel(interpreted.primary)}</p>
-            </div>
-          );
-        })()}
+        <div className="lk-result__diag-summary">
+          <div className="lk-result__diag-summary-icon" aria-hidden="true">
+            <Icon name="check-circle" size={16} color="var(--success)" />
+          </div>
+          <div className="lk-result__diag-summary-copy">
+            <p className="lk-result__diag-summary-title">{diagnosticTitle(interpreted.primary)}</p>
+            <p className="lk-result__diag-summary-text">{diagnosticSummary(interpreted.primary)}</p>
+          </div>
+        </div>
+        <div className="lk-result__diag-tags">
+          <span className="lk-result__diag-tag">Download alto</span>
+          <span className="lk-result__diag-tag">Upload bom</span>
+          <span className="lk-result__diag-tag">Baixa latência</span>
+          <span className="lk-result__diag-tag">
+            {result.packetLoss <= 0 ? 'Sem perda detectada' : 'Falhas detectadas'}
+          </span>
+        </div>
 
         {/* ── Bloco PRIMARY — Download e Upload em fonte enorme ───────────
             Hierarquia visual nova (refactor 2026-05): as duas métricas
@@ -905,104 +745,35 @@ export function ResultScreen({
             também muda de família para casar com a nova cor — sem isso o
             número verde teria aura azul. O `· 97%` da linha plan ganha
             a mesma cor (sutilmente — só o número, nunca a fração). */}
-        {(() => {
-          // Bug-fix 2026-05 (mobile vs plano contratado): a Resolução Anatel
-          // 717/2019 trata banda larga fixa e móvel com regras distintas; em
-          // móvel a noção de "velocidade contratada" não se aplica do mesmo
-          // modo (planos celulares não vendem Mbps fixos contratados). Aqui,
-          // quando `profile === 'mobile_broadband'`, suprimimos a UI de
-          // plano (`/ X Mbps · Y%`) e revertemos as cores para `--dl`/`--ul`
-          // de marca. A função `anatelGrade()` continua funcional para móvel
-          // (60/20%) — esta é uma decisão de RENDERIZAÇÃO, não do modelo.
-          const isMobile = profile === 'mobile_broadband';
-          const dlAnatel = isMobile ? null : anatelGrade(result.dl, contractedDown, profile);
-          const ulAnatel = isMobile ? null : anatelGrade(result.ul, contractedUp,   profile);
-
-          // Inline style respeita o `text-shadow !important` do CSS
-          // setando `text-shadow` também com `!important` via property
-          // fora do React style API — usamos `setProperty` num ref ou,
-          // mais simples, deixamos o CSS receber a cor via custom prop
-          // e mantemos o text-shadow do CSS. Aqui escolhemos a 2ª via:
-          // setamos `--cell-glow` e a regra CSS lê. Mais clean que
-          // `style!important` (que React não suporta nativamente).
-          const dlStyle: CSSProperties = dlAnatel
-            ? ({
-                color: anatelGradeColorVar(dlAnatel),
-                ['--cell-glow' as never]: anatelGradeGlowVar(dlAnatel),
-              } as CSSProperties)
-            : { color: 'var(--phase-dl)' };
-          const ulStyle: CSSProperties = ulAnatel
-            ? ({
-                color: anatelGradeColorVar(ulAnatel),
-                ['--cell-glow' as never]: anatelGradeGlowVar(ulAnatel),
-              } as CSSProperties)
-            : { color: 'var(--phase-ul)' };
-
-          const dlPctStyle: CSSProperties | undefined = dlAnatel
-            ? { color: anatelGradeColorVar(dlAnatel) }
-            : undefined;
-          const ulPctStyle: CSSProperties | undefined = ulAnatel
-            ? { color: anatelGradeColorVar(ulAnatel) }
-            : undefined;
-
-          // Em móvel, ignora `contractedDown/Up` para fins de UI — mesmo
-          // que o usuário tenha cadastrado, a linha plan não aparece.
-          const showDlPlan = !isMobile && contractedDown != null && contractedDown > 0;
-          const showUlPlan = !isMobile && contractedUp   != null && contractedUp   > 0;
-
-          return (
-            <div className="lk-result__primary-block">
-              <div className="lk-result__primary-cell">
-                <div className="lk-result__primary-cell-label">Download</div>
-                <div className="lk-result__primary-cell-value" style={dlStyle}>
-                  {formatMbps(animDl, unit)}
-                </div>
-                {showDlPlan ? (
-                  <div className="lk-result__primary-cell-plan">
-                    <span className="lk-result__primary-cell-plan-frac">/ {formatMbps(contractedDown!, unit)} {unitLabel}</span>
-                    <span className="lk-result__primary-cell-plan-sep" aria-hidden="true">·</span>
-                    <span className="lk-result__primary-cell-plan-pct" style={dlPctStyle}>{Math.round((result.dl / contractedDown!) * 100)}%</span>
-                  </div>
-                ) : (
-                  <div className="lk-result__primary-cell-unit">{unitLabel}</div>
-                )}
-              </div>
-              <div className="lk-result__primary-cell">
-                <div className="lk-result__primary-cell-label">Upload</div>
-                {/* Bug-fix 2026-05 (upload mobile): quando ulFailed=true o
-                    teste foi parcial — DL/latência OK, upload sem amostras
-                    válidas (uplink celular saturado). Mostra "—" e legenda
-                    "não medido" em vez de "0,00 Mbps", que daria leitura
-                    enganosa de uplink zerado. */}
-                {result.ulFailed ? (
-                  <>
-                    <div className="lk-result__primary-cell-value" style={{ color: 'var(--text-muted)' }}>
-                      —
-                    </div>
-                    <div className="lk-result__primary-cell-unit" style={{ color: 'var(--text-muted)' }}>
-                      não medido
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="lk-result__primary-cell-value" style={ulStyle}>
-                      {formatMbps(animUl, unit)}
-                    </div>
-                    {showUlPlan ? (
-                      <div className="lk-result__primary-cell-plan">
-                        <span className="lk-result__primary-cell-plan-frac">/ {formatMbps(contractedUp!, unit)} {unitLabel}</span>
-                        <span className="lk-result__primary-cell-plan-sep" aria-hidden="true">·</span>
-                        <span className="lk-result__primary-cell-plan-pct" style={ulPctStyle}>{Math.round((result.ul / contractedUp!) * 100)}%</span>
-                      </div>
-                    ) : (
-                      <div className="lk-result__primary-cell-unit">{unitLabel}</div>
-                    )}
-                  </>
-                )}
-              </div>
+        <div className="lk-result__primary-block">
+          <div className="lk-result__primary-cell">
+            <div className="lk-result__primary-cell-label">Download</div>
+            <div className="lk-result__primary-cell-value">
+              {formatMbps(animDl, unit)}
             </div>
-          );
-        })()}
+            <div className="lk-result__primary-cell-unit">{unitLabel}</div>
+          </div>
+          <div className="lk-result__primary-cell">
+            <div className="lk-result__primary-cell-label">Upload</div>
+            {result.ulFailed ? (
+              <>
+                <div className="lk-result__primary-cell-value" style={{ color: 'var(--text-muted)' }}>
+                  —
+                </div>
+                <div className="lk-result__primary-cell-unit" style={{ color: 'var(--text-muted)' }}>
+                  não medido
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="lk-result__primary-cell-value">
+                  {formatMbps(animUl, unit)}
+                </div>
+                <div className="lk-result__primary-cell-unit">{unitLabel}</div>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* ── Bloco SECONDARY — diagnóstico em fonte média ──────────────
             Resposta (latency), Oscilação (jitter) e Falhas (packet loss).
@@ -1020,10 +791,10 @@ export function ResultScreen({
             <div className="lk-result__secondary-block" style={gridStyle}>
               <div className="lk-result__secondary-cell">
                 <div className="lk-result__secondary-cell-label">
-                  Resposta
+                  Ping
                   <InfoTooltip
                     label="Tempo até a primeira resposta do servidor. Quanto menor, melhor pra jogos e videochamadas."
-                    ariaLabel="O que é Resposta"
+                    ariaLabel="O que é Ping"
                   />
                 </div>
                 <div className="lk-result__secondary-cell-value">
@@ -1097,7 +868,7 @@ export function ResultScreen({
 
         <div className={`lk-result__confidence lk-result__confidence--${measurementConfidence.level}`}>
           <div className="lk-result__confidence-top">
-            <span className="lk-result__confidence-kicker">Confiança da medição</span>
+            <span className="lk-result__confidence-kicker">Confiabilidade da medição</span>
             <span className="lk-result__confidence-badge">{measurementConfidence.label}</span>
           </div>
           <p className="lk-result__confidence-reason">{measurementConfidence.reason}</p>
@@ -1113,99 +884,28 @@ export function ResultScreen({
           {complementaryTest === 'dns' && (
             <>
               <p className="lk-result__next-test-text">Seu próximo passo mais útil agora é validar Serviços de Internet (DNS).</p>
-              <button type="button" className="btn-text lk-result__next-test-btn" onClick={() => setActiveSheet('dns')}>
-                Abrir teste de DNS
+              <button type="button" className="btn-text lk-result__next-test-btn" onClick={() => setActiveSheet('advanced')}>
+                Abrir avançado
               </button>
             </>
           )}
           {complementaryTest === 'wifi' && (
             <>
               <p className="lk-result__next-test-text">Vale conferir sinais de Wi-Fi e histórico para confirmar se o problema é local.</p>
-              {onExplore && (
-                <button type="button" className="btn-text lk-result__next-test-btn" onClick={onExplore}>
-                  Abrir Ferramentas
-                </button>
-              )}
+              <button type="button" className="btn-text lk-result__next-test-btn" onClick={() => setActiveSheet('advanced')}>
+                Abrir avançado
+              </button>
             </>
           )}
           {complementaryTest === 'advanced' && (
             <>
               <p className="lk-result__next-test-text">Faça uma checagem avançada para confirmar estabilidade e variações da conexão.</p>
               <button type="button" className="btn-text lk-result__next-test-btn" onClick={() => setActiveSheet('advanced')}>
-                Abrir Avançado
+                Abrir avançado
               </button>
             </>
           )}
         </div>
-
-        {/* ── W5-A — Card RQUAL Anatel ─────────────────────────────────
-            Aparece apenas quando o usuário cadastrou velocidade contratada
-            e não está em rede móvel. Exibe status aprovado/parcial/reprovado
-            baseado nos critérios do Ato 7869/2022 (ANATEL): 80% = normal,
-            40% = mínimo garantido. Sem "hora de pico" — não existe
-            normativamente. Tooltip educativo com 3 parágrafos. */}
-        {(() => {
-          const isMobile = profile === 'mobile_broadband';
-          if (isMobile) return null;
-
-          // Avalia download e upload individualmente para exibir breakdown.
-          const dlOnlyStatus = rqualSingleStatus(result.dl, contractedDown);
-          if (!dlOnlyStatus) return null; // sem contratado, sem card
-
-          const ulOnlyStatus =
-            !result.ulFailed && result.ul != null
-              ? rqualSingleStatus(result.ul, contractedUp)
-              : null;
-
-          // Status geral = pior dos dois (não-null garantido: dlOnlyStatus passou).
-          const overallStatus: NonNullable<RqualStatus> = rqualStatus(
-            result.dl, contractedDown,
-            result.ulFailed ? null : result.ul,
-            contractedUp,
-            result.ulFailed,
-          ) ?? dlOnlyStatus;
-
-          const statusColor = rqualColor(overallStatus);
-          const statusBg = rqualBgColor(overallStatus);
-
-          return (
-            <div className="lk-result__rqual" style={{ borderColor: statusColor, background: statusBg }}>
-              <div className="lk-result__rqual-header">
-                <div className="lk-result__rqual-header-left">
-                  <span className="lk-result__rqual-kicker">ANATEL — Entrega de velocidade</span>
-                  <div className="lk-result__rqual-status-row">
-                    {overallStatus === 'aprovado' && (
-                      <Icon name="check-circle" size={16} color={statusColor} />
-                    )}
-                    {overallStatus !== 'aprovado' && (
-                      <Icon name="info" size={16} color={statusColor} />
-                    )}
-                    <span className="lk-result__rqual-status-label" style={{ color: statusColor }}>
-                      {rqualLabel(overallStatus)}
-                    </span>
-                  </div>
-                  {/* Breakdown DL/UL quando upload também foi avaliado */}
-                  {ulOnlyStatus !== null && (
-                    <div className="lk-result__rqual-breakdown" aria-label="Detalhe por direção">
-                      <span style={{ color: rqualColor(dlOnlyStatus) }}>
-                        DL: {rqualLabel(dlOnlyStatus)}
-                      </span>
-                      <span className="lk-result__rqual-breakdown-sep" aria-hidden="true">·</span>
-                      <span style={{ color: rqualColor(ulOnlyStatus) }}>
-                        UL: {rqualLabel(ulOnlyStatus)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <InfoTooltip
-                  label={RQUAL_TOOLTIP}
-                  ariaLabel="Entenda os critérios ANATEL de velocidade contratada"
-                />
-              </div>
-              <p className="lk-result__rqual-conclusion">{rqualConclusion(overallStatus)}</p>
-            </div>
-          );
-        })()}
 
         {/* ── Use cases row — agora com grade A-F por cenário ──────────
             A grade vem de `useCaseGrade()` (src/core/useCaseGrade.ts):
@@ -1245,9 +945,7 @@ export function ResultScreen({
             )}
             <div className="lk-result__use-divider" />
             {interpreted.useCases.map(({ id, status, blockingFactors }) => {
-              const grade = computeUseCaseGrade({ id, status, blockingFactors }, result, profile);
-              const isPositive = grade === 'A' || grade === 'B';
-              const gStyle = gradeStyle(grade);
+              const isPositive = status === 'good';
               return (
                 <div key={id}>
                   <div className="lk-result__use-item">
@@ -1268,8 +966,8 @@ export function ResultScreen({
                         <span style={{ color: 'var(--success)', fontSize: 12, marginLeft: 4 }}>Adequada</span>
                       </span>
                     ) : (
-                      <span className="lk-result__use-badge" style={gStyle}>
-                        {gradeLabel(grade)}
+                      <span className="lk-result__use-badge" style={{ background: 'var(--color-warn-bg)', color: 'var(--warn)' }}>
+                        Atenção
                       </span>
                     )}
                   </div>
@@ -1415,26 +1113,6 @@ export function ResultScreen({
             ]}
           />
         </section>
-
-        {/* Atalho residual para a tela "Explorar" (Histórico + Ferramentas).
-            Fica como item único — o que era "Diagnóstico/Recomendações/
-            Detalhes" virou conteúdo desta própria tela. */}
-        {onExplore && (
-          <div className="lk-result__tools">
-            <IOSList
-              items={[
-                {
-                  icon: <Icon name="cog" size={14} color="var(--text-2)" />,
-                  iconBg: 'var(--surface-3)',
-                  title: 'Ferramentas',
-                  subtitle: 'Histórico, comparações e teste por local',
-                  showChevron: true,
-                  onClick: onExplore,
-                },
-              ]}
-            />
-          </div>
-        )}
 
         <div className="lk-result__footer">
           <button className="btn-primary lk-result__retry" onClick={onRetry}>

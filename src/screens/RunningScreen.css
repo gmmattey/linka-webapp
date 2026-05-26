@@ -5,7 +5,7 @@
   height: 100dvh;
   background: transparent;
   overflow: hidden;
-  padding-top: calc(var(--safe-top) + 64px);
+  padding-top: calc(var(--safe-top) + 16px);
 }
 
 /* Bloco 5 — TopBar System (2026-05): linha "Servidor · Local · ISP"

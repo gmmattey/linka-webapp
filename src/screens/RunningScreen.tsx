@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Gauge } from '../components/Gauge';
 import { LiveChart } from '../components/LiveChart';
-import { TopBar } from '../components/TopBar';
 import { resolveCopy } from '../core';
 import { formatMbps } from '../utils/format';
 import { triggerHaptic } from '../utils/haptics';
@@ -202,10 +201,6 @@ export function RunningScreen({
   if (phase === 'error') {
     return (
       <div className="lk-running">
-        {/* Bloco 5 — TopBar System (2026-05): tela de erro mantém TopBar
-            com título "Erro" sempre visível; sem back (o usuário decide
-            via botões "Testar novamente" / "Cancelar"). */}
-        <TopBar title="Erro" showTitle scrolled={false} />
         <main className="lk-running__main lk-running__main--error">
           <div className="lk-running__error" role="alert">
             <div className="lk-running__error-icon" aria-hidden="true">
@@ -228,10 +223,6 @@ export function RunningScreen({
 
   return (
     <div className="lk-running">
-      {/* Bloco 5 — TopBar System (2026-05): título "Medindo…" sempre visível
-          (showTitle permanente). Sem back — não dá para abandonar mid-test
-          pelo header; usuário usa o botão "Cancelar" no rodapé. */}
-      <TopBar title="Central de testes" showTitle scrolled={false} />
       {serverLine && (
         <p className="lk-running__server-line" title={serverLine}>
           {serverLine}

@@ -25,7 +25,8 @@
   flex: 1;
   overflow-y: auto;
   padding: 0 16px 0;
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  background: radial-gradient(circle at 50% 10%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 44%);
 }
 
 .lk-local-network__scroll > .lk-page-header {
@@ -146,6 +147,11 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 10px 24px rgba(13, 30, 56, 0.08);
+  padding: 12px 14px 4px;
 }
 
 .lk-local-network__section-header {
@@ -169,8 +175,11 @@
   font-size: 13px;
   color: var(--text-3);
   text-align: center;
-  padding: 8px 0;
+  padding: 12px 14px;
   line-height: 1.5;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
 }
 
 /* ── Device Row ────────────────────────────────────── */
@@ -179,7 +188,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 0;
+  padding: 14px 4px;
   border-bottom: 1px solid var(--hairline);
   cursor: pointer;
   transition: opacity var(--t-fast);
@@ -298,8 +307,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: none;
-  border: 1.5px solid var(--border);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  border: 1.5px solid var(--accent-border);
   border-radius: 100px;
   padding: 11px 24px;
   font-size: 14px;
