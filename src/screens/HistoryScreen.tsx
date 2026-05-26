@@ -29,12 +29,12 @@ export function HistoryScreen({ theme, unit, initialSelectedId, onBack, onRefres
       <ChartCard percent="99,2%" labels={uptimeLabels} values={uptimeData} />
 
       <StatusCard>
-        <h3 style={{ marginTop: 0, marginBottom: 10, color: '#0f172a', fontSize: 16 }}>Resumo</h3>
+        <h3 style={{ marginTop: 0, marginBottom: 10, color: 'var(--text)', fontSize: 16 }}>Resumo</h3>
         <div style={{ display: 'flex', gap: 8 }}>
-          <Icon name="security" size={18} color="#16a34a" />
+          <Icon name="security" size={18} color="var(--success)" />
           <div>
-            <strong style={{ color: '#0f172a', fontSize: 14 }}>Sua rede está estável e saudável.</strong>
-            <p style={{ margin: '5px 0', color: '#64748b', fontSize: 11, lineHeight: 1.45 }}>Excelente desempenho nos últimos 7 dias. Houve uma pequena instabilidade no dia 19/05, mas tudo voltou ao normal.</p>
+            <strong style={{ color: 'var(--text)', fontSize: 14 }}>Sua rede está estável e saudável.</strong>
+            <p style={{ margin: '5px 0', color: 'var(--text-2)', fontSize: 11, lineHeight: 1.45 }}>Excelente desempenho nos últimos 7 dias. Houve uma pequena instabilidade no dia 19/05, mas tudo voltou ao normal.</p>
             <button type="button" style={{ color: 'var(--accent)', fontWeight: 600, fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4 }} onClick={() => alert('Abrir relatório completo')}>
               Ver relatório completo
               <Icon name="chevron" size={12} color="var(--accent)" />
