@@ -19,6 +19,8 @@ export interface Settings {
   region: string;
   qualityAlertsActive: boolean;
   alertThresholdMbps: number;
+  checkInterval: 1 | 5 | 10 | 30;
+  notificationsEnabled: boolean;
 }
 
 const KEY = 'linka.speedtest.settings.v1';
@@ -36,6 +38,8 @@ const DEFAULTS: Settings = {
   region: '',
   qualityAlertsActive: false,
   alertThresholdMbps: 0,
+  checkInterval: 5,
+  notificationsEnabled: false,
 };
 
 function load(): Settings {
