@@ -11,7 +11,7 @@ import { rulesEngine } from './rulesEngine';
 import { withLocalDiagnosisFooter } from './fallback';
 import { checkDiagnosisWorkerAvailability, postDiagnosisWorker, type DiagnosisWorkerResponse } from './workerClient';
 
-function mapStatusToSeverity(status?: string): Severity {
+export function mapStatusToSeverity(status?: string): Severity {
   switch ((status ?? '').toLowerCase()) {
     case 'excelente':
     case 'bom':
@@ -26,7 +26,7 @@ function mapStatusToSeverity(status?: string): Severity {
   }
 }
 
-function mapProblemToCause(problemType?: string): DiagnosisCause {
+export function mapProblemToCause(problemType?: string): DiagnosisCause {
   const t = (problemType ?? '').toLowerCase();
   if (!t || t === 'sem_problema') return 'healthy';
   if (t.includes('dns')) return 'dns';
@@ -38,7 +38,7 @@ function mapProblemToCause(problemType?: string): DiagnosisCause {
   return 'unknown';
 }
 
-function mapPriority(priority?: string): 'high' | 'medium' | 'low' {
+export function mapPriority(priority?: string): 'high' | 'medium' | 'low' {
   switch ((priority ?? '').toLowerCase()) {
     case 'alta':
     case 'high':
