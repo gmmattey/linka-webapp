@@ -16,6 +16,7 @@ import type { DiagnosisRecommendation, ContractPlanInfo } from './types';
 import type { ConnectionType, SpeedTestResult as AppSpeedTestResult } from '../../types';
 import { speedTestResultToEngineInput } from './diagnosisAdapter';
 import { combinedDiagnosis } from './claudeApi';
+import { withLocalDiagnosisFooter } from './fallback';
 
 export interface UseDiagnosisResult {
   data: DiagnosisRecommendation | null;
@@ -93,7 +94,7 @@ export function useDiagnosis(
               cause: 'unknown',
               severity: 'warn',
               title: 'Erro ao diagnosticar',
-              summary: 'Não conseguimos processar o diagnóstico. Tente novamente.',
+              summary: withLocalDiagnosisFooter('Não conseguimos processar o diagnóstico. Tente novamente.'),
               problems: [],
               recommendations: [],
               confidence: 0,
