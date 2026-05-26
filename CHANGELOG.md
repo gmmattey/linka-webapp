@@ -2,6 +2,22 @@
 
 All notable changes to Linka WebApp are documented here.
 
+## [1.7.0] — 2026-05-26
+
+### Added
+- **Análise de Conexão** (`AiScreen`): tela completa com conteúdo real, substituindo o dead-end "Módulo em preparação"
+- `connectionAnalysis.ts`: utilitário de métricas locais (stddev, tendência, horários, índice de estabilidade)
+- Grid de 6 métricas: download médio, latência, jitter, variação, perda, tendência
+- Barra de estabilidade 0–100 com classificação visual
+- Análise de melhor/pior horário do dia (quando dados suficientes)
+- Cards de insight gerados por `buildHistoryInsights` (regras existentes)
+- Estado vazio quando < 5 testes com contador e CTA para testar
+- Renomeado de "Diagnóstico IA" para "Análise de Conexão"
+- Disclaimer de privacidade: "Os dados nunca saem do seu dispositivo"
+
+### Closes
+- #54 — Diagnóstico Inteligente (Orbit / AI)
+
 ## [1.6.0] — 2026-05-26
 
 ### Added
