@@ -5,7 +5,7 @@ import { formatMbps, formatMs } from './format';
 export function buildShareText(result: SpeedTestResult, quality: Quality, unit: 'mbps' | 'gbps' = 'mbps'): string {
   const unitLabel = unit === 'gbps' ? 'Gbps' : 'Mbps';
   return [
-    `linka SpeedTest — ${resolveCopy(`quality.${quality}`)}`,
+    `Veloo — ${resolveCopy(`quality.${quality}`)}`,
     `↓ ${formatMbps(result.dl, unit)} ${unitLabel} · ↑ ${formatMbps(result.ul, unit)} ${unitLabel}`,
     `Resposta ${formatMs(result.latency)} ms · Oscilação ${formatMs(result.jitter)} ms`,
     new Date(result.timestamp).toLocaleString('pt-BR'),
@@ -14,7 +14,7 @@ export function buildShareText(result: SpeedTestResult, quality: Quality, unit: 
 
 export async function shareResultText(text: string): Promise<'shared' | 'copied' | 'none'> {
   if (navigator.share) {
-    try { await navigator.share({ title: 'linka SpeedTest', text }); return 'shared'; }
+    try { await navigator.share({ title: 'Veloo', text }); return 'shared'; }
     catch { return 'none'; }
   }
   if (navigator.clipboard) {

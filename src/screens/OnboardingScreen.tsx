@@ -117,7 +117,7 @@ const CARDS = [
   {
     art: <GaugeArt />,
     title: 'Sua internet explicada em português',
-    sub: 'Não só os números: a linka analisa sua conexão e te diz o que está acontecendo.',
+    sub: 'Não só os números: o Veloo analisa sua conexão e te diz o que está acontecendo.',
   },
   {
     art: <PermissionsArt />,
@@ -195,7 +195,7 @@ export function OnboardingScreen({ onComplete }: Props) {
       className="lk-onb"
       role="dialog"
       aria-modal="true"
-      aria-label="Bem-vindo à linka"
+      aria-label="Bem-vindo ao Veloo"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >

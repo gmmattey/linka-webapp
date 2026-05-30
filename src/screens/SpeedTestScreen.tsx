@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { DeviceInfo, ServerInfo, TestRecord } from '../types';
 import type { Settings } from '../hooks/useSettings';
 import { Icon } from '../components/icons';
-import { AppHeader, Badge, QuickActionCard, SectionTitle, SpeedGauge, StatusCard, AppScaffold } from '../components/ui/app-ui';
+import { AppHeader, Badge, QuickActionCard, SectionTitle, StatusCard, AppScaffold } from '../components/ui/app-ui';
 import { usePingTool, type PingQuality } from '../hooks/usePingTool';
 import { useDnsLookupTool } from '../hooks/useDnsLookupTool';
 
@@ -41,8 +41,27 @@ const PING_QUALITY_TONE: Record<PingQuality, 'success' | 'info' | 'warn' | 'erro
 
 /* ── Componente principal ── */
 
-export function SpeedTestScreen({ onStart, lastRecord }: Props) {
-  const value = Math.round(lastRecord?.dl ?? 524);
+function formatTime(timestamp: number): string {
+  return new Date(timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function MetricCard({ label, value, unit }: { label: string; value: string; unit: string }) {
+  return (
+    <div style={{
+      background: 'var(--surface-2, var(--surface))',
+      border: '1px solid var(--border)',
+      borderRadius: 10,
+      padding: '10px 8px',
+      textAlign: 'center',
+    }}>
+      <p style={{ margin: '0 0 2px', fontSize: 11, color: 'var(--text-3)' }}>{label}</p>
+      <strong style={{ fontSize: 18, color: 'var(--text)', fontFamily: 'var(--font-display)', display: 'block' }}>{value}</strong>
+      {unit ? <span style={{ fontSize: 10, color: 'var(--text-3)' }}>{unit}</span> : null}
+    </div>
+  );
+}
+
+export function SpeedTestScreen({ onStart, lastRecord, cancelledNotice, onDismissCancelledNotice }: Props) {
   const [activeTool, setActiveTool] = useState<ActiveTool>(null);
 
   const ping = usePingTool();
@@ -70,27 +89,52 @@ export function SpeedTestScreen({ onStart, lastRecord }: Props) {
         }
       />
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-        <Badge text="Rápido" tone="info" />
-        <Badge text="Completo" />
-        <Badge text="Triplo" />
-      </div>
-
-      <StatusCard>
-        <SpeedGauge value={value} />
-      </StatusCard>
-
-      <StatusCard>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Icon name="check-circle" size={18} color="#16a34a" />
-          <div style={{ flex: 1 }}>
-            <strong style={{ color: 'var(--text)', fontSize: 14 }}>Teste concluído</strong>
-            <p style={{ margin: 0, color: 'var(--text-2)', fontSize: 12 }}>Excelente desempenho!</p>
-            <small style={{ color: 'var(--text-3)', fontSize: 11 }}>Hoje, 09:28 · Servidor: São Paulo</small>
+      {cancelledNotice && (
+        <StatusCard>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ color: 'var(--warn)', fontSize: 13 }}>Teste cancelado.</span>
+            <button type="button" onClick={onDismissCancelledNotice} style={{ color: 'var(--text-3)', fontSize: 12, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
+              Fechar
+            </button>
           </div>
-          <Icon name="chevron" size={12} color="var(--text-3)" />
-        </div>
+        </StatusCard>
+      )}
+
+      <StatusCard>
+        <button
+          type="button"
+          onClick={() => onStart('complete')}
+          className="btn-primary"
+          style={{ width: '100%', height: 52, fontSize: 16 }}
+        >
+          Testar velocidade
+        </button>
+        <button
+          type="button"
+          onClick={() => onStart('fast')}
+          className="btn-text"
+          style={{ width: '100%', marginTop: 8, fontSize: 13 }}
+        >
+          Modo rápido
+        </button>
       </StatusCard>
+
+      {lastRecord && (
+        <StatusCard>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <strong style={{ fontSize: 15, color: 'var(--text)' }}>Último teste</strong>
+            <small style={{ color: 'var(--text-3)', fontSize: 11 }}>
+              {formatTime(lastRecord.timestamp)}
+              {lastRecord.serverName ? ` · ${lastRecord.serverName}` : ''}
+            </small>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
+            <MetricCard label="Download" value={`${Math.round(lastRecord.dl)}`} unit="Mbps" />
+            <MetricCard label="Upload" value={lastRecord.ulFailed ? '--' : `${lastRecord.ul.toFixed(1).replace('.', ',')}`} unit={lastRecord.ulFailed ? '' : 'Mbps'} />
+            <MetricCard label="Ping" value={`${Math.round(lastRecord.latency)}`} unit="ms" />
+          </div>
+        </StatusCard>
+      )}
 
       <SectionTitle title="Ferramentas" compact />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 8, marginBottom: 12 }}>
@@ -99,10 +143,6 @@ export function SpeedTestScreen({ onStart, lastRecord }: Props) {
         <QuickActionCard icon="globe" label="DNS Lookup" onClick={() => openTool('dns')} />
         <QuickActionCard icon="network" label="Port Scan" onClick={() => openTool('portscan')} />
       </div>
-
-      <button type="button" className="btn-text" style={{ width: '100%', marginTop: 6, fontWeight: 600 }} onClick={() => onStart('fast')}>
-        Iniciar novo teste
-      </button>
 
       {/* ── Modais de ferramentas ── */}
 
@@ -364,7 +404,7 @@ function PwaLimitationSheet({ title, reason, onClose }: { title: string; reason:
             {reason}
           </p>
           <p style={{ margin: '8px 0 0', fontSize: 12, color: 'var(--text-3)', lineHeight: 1.4 }}>
-            Esta funcionalidade estará disponível no aplicativo nativo Linka, que tem acesso direto às interfaces de rede do dispositivo.
+            Esta funcionalidade estará disponível no aplicativo nativo Veloo, que tem acesso direto às interfaces de rede do dispositivo.
           </p>
         </div>
       </div>

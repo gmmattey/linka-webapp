@@ -1,4 +1,4 @@
-export const LOCAL_DIAGNOSIS_FOOTER = 'Motor de análise: Diagnóstico local do Linka';
+export const LOCAL_DIAGNOSIS_FOOTER = 'Motor de análise: Diagnóstico local do Veloo';
 
 export function withLocalDiagnosisFooter(text: string): string {
   const base = text.trim();
