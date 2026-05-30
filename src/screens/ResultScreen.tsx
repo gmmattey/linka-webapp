@@ -60,6 +60,7 @@ interface Props {
   hideIpOnShare?: boolean;
   gamingProfile?: GamingProfile;
   connectionType?: ConnectionType | null;
+  onShowDiagnostico?: () => void;
 }
 
 type ShareStatus = 'idle' | 'copied';
@@ -312,6 +313,7 @@ export function ResultScreen({
   onRetry, onBack,
   unit = 'mbps',
   connectionType,
+  onShowDiagnostico,
 }: Props) {
   void theme;
   void onToggleTheme;
@@ -401,7 +403,7 @@ export function ResultScreen({
 
   const buildQuickShareText = useCallback(() => {
     const lines = [
-      'Resultado LINKA SpeedTest',
+      'Resultado Veloo',
       `Download: ${formatMbps(result.dl)} Mbps`,
       `Upload: ${result.ulFailed ? 'parcial/indisponível' : `${formatMbps(result.ul)} Mbps`}`,
       `Latência: ${formatMs(result.latency)} ms`,
@@ -494,7 +496,7 @@ export function ResultScreen({
   const handleDownloadSupportSummary = useCallback(() => {
     const when = new Date(result.timestamp).toLocaleString('pt-BR');
     const summary = [
-      'LINKA SpeedTest - Evidência resumida para suporte',
+      'Veloo - Evidência resumida para suporte',
       '',
       `Data/hora: ${when}`,
       `Download: ${formatMbps(result.dl)} Mbps`,
@@ -1109,6 +1111,14 @@ export function ResultScreen({
                 showChevron: true,
                 onClick: () => setActiveSheet('dns'),
               },
+              ...(onShowDiagnostico ? [{
+                icon: <Icon name="shield" size={14} color="var(--accent)" />,
+                iconBg: 'var(--accent-tint)',
+                title: 'Diagnóstico com IA',
+                subtitle: 'Análise detalhada por inteligência artificial',
+                showChevron: true,
+                onClick: onShowDiagnostico,
+              }] : []),
             ]}
           />
         </section>
@@ -1210,6 +1220,7 @@ export function ResultScreen({
 //   - Modo Gamer → src/features/result-detail/GamerSheet.tsx
 //   - DNS        → src/features/dns/DNSGuideSheet.tsx (já existia)
 // =============================================================================
+
 
 
 

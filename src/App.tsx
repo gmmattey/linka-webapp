@@ -41,6 +41,12 @@ const FibraScreen = lazy(() =>
 const OnboardingScreen = lazy(() =>
   import('./screens/OnboardingScreen').then((m) => ({ default: m.OnboardingScreen })),
 );
+const DiagnosticoScreen = lazy(() =>
+  import('./screens/DiagnosticoScreen').then((m) => ({ default: m.DiagnosticoScreen })),
+);
+const ChatDiagnosticoScreen = lazy(() =>
+  import('./screens/ChatDiagnosticoScreen').then((m) => ({ default: m.ChatDiagnosticoScreen })),
+);
 
 // Telas com nome alinhado ao Kotlin. Rotas de abas principais:
 //   home | velocidade | sinal | historico | ajustes
@@ -56,7 +62,9 @@ type Screen =
   | 'ajustes'
   | 'sinal'
   | 'dispositivos'
-  | 'fibra';
+  | 'fibra'
+  | 'diagnostico'
+  | 'chat-diagnostico';
 
 // Mapeamento de tela → aba ativa no BottomNavBar.
 // Sub-telas mantêm a aba da origem destacada (padrão MD3).
@@ -71,7 +79,7 @@ const TAB_MAP: Partial<Record<Screen, NavTab>> = {
 };
 
 // Telas em que o BottomNavBar fica oculto (fluxo de teste)
-const HIDE_NAVBAR: Screen[] = ['running', 'result', 'orbit'];
+const HIDE_NAVBAR: Screen[] = ['running', 'result', 'orbit', 'diagnostico', 'chat-diagnostico'];
 
 const THEME_KEY = 'linka.speedtest.theme';
 const ONBOARDING_KEY = 'linka.onboarding.done';
@@ -318,6 +326,8 @@ export default function App() {
 
   const handleOpenOrbit = useCallback(() => goTo('orbit'), [goTo]);
   const handleShowSinal = useCallback(() => goTo('sinal'), [goTo]);
+  const handleShowDiagnostico = useCallback(() => goTo('diagnostico'), [goTo]);
+  const handleShowChatDiagnostico = useCallback(() => goTo('chat-diagnostico'), [goTo]);
   // goTo('dispositivos') available via TAB_MAP navigation
   const handleShowFibra = useCallback(() => goTo('fibra'), [goTo]);
 
@@ -435,6 +445,7 @@ export default function App() {
             hideIpOnShare={settings.hideIpOnShare}
             gamingProfile={settings.gamingProfile}
             connectionType={deviceInfo.device?.connectionType ?? null}
+            onShowDiagnostico={handleShowDiagnostico}
           />
         ) : null;
       }
@@ -456,6 +467,27 @@ export default function App() {
         return <LocalNetworkScreen onBack={() => goTo('home')} />;
       case 'fibra':
         return <FibraScreen onBack={goBack} />;
+      case 'diagnostico': {
+        const r = test.result ?? (lastRecord ? recordToResult(lastRecord) : null);
+        return r ? (
+          <DiagnosticoScreen
+            result={r}
+            connectionType={deviceInfo.device?.connectionType}
+            onBack={goBack}
+            onOpenChat={handleShowChatDiagnostico}
+          />
+        ) : null;
+      }
+      case 'chat-diagnostico': {
+        const r = test.result ?? (lastRecord ? recordToResult(lastRecord) : null);
+        return r ? (
+          <ChatDiagnosticoScreen
+            result={r}
+            connectionType={deviceInfo.device?.connectionType}
+            onBack={goBack}
+          />
+        ) : null;
+      }
       case 'orbit':
         return <AiScreen onOpenSpeed={() => handleNavTab('velocidade')} />;
       case 'historico':
@@ -497,6 +529,7 @@ export default function App() {
     previous, lastRecord, historyInitialId,
     handleStart, handleCancel, handleRetry, handleShowHistory, handleNavTab,
     handleOpenOrbit, handleShowSinal, handleShowFibra,
+    handleShowDiagnostico, handleShowChatDiagnostico,
     handleAppRefresh, handleResetOnboarding,
     goBack, goTo, goToReturnTarget,
     settings, updateSettings, testMode, testCancelledNotice,
