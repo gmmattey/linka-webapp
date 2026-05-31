@@ -69,7 +69,7 @@ export async function generateShareCard(
   // Logo "linka SpeedTest" topo
   ctx.fillStyle = TEXT;
   ctx.font = '700 36px "Geist", sans-serif';
-  ctx.fillText('linka', 80, 110);
+  ctx.fillText('Veloo', 80, 110);
   ctx.fillStyle = TEXT_2;
   ctx.font = '500 28px "Geist", sans-serif';
   ctx.fillText('SpeedTest', 200, 110);
@@ -181,3 +181,4 @@ function wrapText(
   }
   if (line) ctx.fillText(line, x, yy);
 }
+

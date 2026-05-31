@@ -19,7 +19,7 @@ const COLORS = {
 // uma versão anterior do branding; a fonte não está carregada no projeto
 // e caía pro fallback `system-ui`, gerando inconsistência visual entre o
 // PDF exportado e a UI. Agora usa Geist como o resto do app.
-const LOGO_HTML = `<span style="font-family:'Geist',system-ui,sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.03em;color:${COLORS.accent};">linka</span>`;
+const LOGO_HTML = `<span style="font-family:'Geist',system-ui,sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.03em;color:${COLORS.accent};">Veloo</span>`;
 
 export async function exportResultPdf(result: SpeedTestResult, serverName: string, isp?: string) {
   const interpreted = interpretSpeedTestResult(result, 'fixed_broadband', []);
@@ -55,7 +55,7 @@ export async function exportResultPdf(result: SpeedTestResult, serverName: strin
       <div style="font-family:'Geist',sans-serif;font-weight:600;font-size:15px;margin-bottom:8px;">O que isso significa?</div>
       ${interpreted.copyKeys.diagnosisKeys.map((k) => resolveCopy(k)).map((p) => `<p style="margin:0 0 8px 0;line-height:1.5;">${p}</p>`).join('')}
     </div>
-    <div style="margin-top:32px;color:#9CA3AF;font-size:10px;">Gerado por linka SpeedTest</div>
+    <div style="margin-top:32px;color:#9CA3AF;font-size:10px;">Gerado por Veloo</div>
     <div style="margin-top:6px;color:#9CA3AF;font-size:9px;">Medições feitas via Cloudflare Speed Test. Não substitui aferição oficial via EAQ Anatel — serve como prova circunstancial em reclamações.</div>
   `;
 
@@ -70,7 +70,7 @@ export async function exportResultPdf(result: SpeedTestResult, serverName: strin
     const imgWidth   = pageWidth - 48;
     const imgHeight  = imgWidth * ratio;
     pdf.addImage(imgData, 'PNG', 24, 24, imgWidth, Math.min(imgHeight, pageHeight - 48));
-    pdf.save(`linka-relatorio-${formatDateIsoLike(result.timestamp)}.pdf`);
+    pdf.save(`veloo-relatorio-${formatDateIsoLike(result.timestamp)}.pdf`);
   } finally {
     node.remove();
   }
@@ -133,7 +133,7 @@ export async function exportHistoryPdf(items: TestRecord[]) {
       </thead>
       <tbody style="font-family:'Geist',sans-serif;">${rows}</tbody>
     </table>
-    <div style="margin-top:32px;color:#9CA3AF;font-size:10px;">Gerado por linka SpeedTest</div>
+    <div style="margin-top:32px;color:#9CA3AF;font-size:10px;">Gerado por Veloo</div>
     <div style="margin-top:6px;color:#9CA3AF;font-size:9px;">Medições feitas via Cloudflare Speed Test. Não substitui aferição oficial via EAQ Anatel — serve como prova circunstancial em reclamações.</div>
   `;
 
@@ -148,7 +148,7 @@ export async function exportHistoryPdf(items: TestRecord[]) {
     const imgWidth   = pageWidth - 48;
     const imgHeight  = imgWidth * ratio;
     pdf.addImage(imgData, 'PNG', 24, 24, imgWidth, Math.min(imgHeight, pageHeight - 48));
-    pdf.save(`linka-relatorio-historico-${formatDateIsoLike(Date.now())}.pdf`);
+    pdf.save(`veloo-relatorio-historico-${formatDateIsoLike(Date.now())}.pdf`);
   } finally {
     node.remove();
   }

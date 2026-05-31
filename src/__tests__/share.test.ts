@@ -37,7 +37,7 @@ describe('share result', () => {
     expect(outcome).toBe('shared');
     expect(mockShare).toHaveBeenCalledTimes(1);
     expect(mockShare).toHaveBeenCalledWith({
-      title: 'linka SpeedTest',
+      title: 'Veloo',
       text,
     });
     expect(text).toContain('↓ 87.3 Mbps');

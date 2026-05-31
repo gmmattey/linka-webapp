@@ -1,7 +1,7 @@
 {
-  "name": "linka-webapp",
+  "name": "veloo-webapp",
   "private": true,
-  "version": "1.7.0",
+  "version": "2.0.0",
   "license": "MIT",
   "type": "module",
   "scripts": {

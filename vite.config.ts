@@ -50,15 +50,10 @@ export default defineConfig({
         'touch-icon/ios/AppIcon-83.5@2x~ipad.png',
       ],
       manifest: {
-        name: 'linka SpeedTest',
-        short_name: 'linka',
+        name: 'Veloo',
+        short_name: 'Veloo',
         description: 'Entenda a qualidade real da sua internet com clareza.',
-        // theme_color / background_color alinhados com o `--bg` do tema dark
-        // (#000000) e com as `<meta name="theme-color">` em `index.html`.
-        // Antes: '#6C2BFF' (accent roxo) — causava flash roxo no splash do
-        // PWA iOS/Android antes do app pintar a tela. Mantido o roxo apenas
-        // como cor da marca em UI (`--accent`), não como cor de chrome/splash.
-        theme_color: '#000000',
+        theme_color: '#6C2BFF',
         background_color: '#000000',
         display: 'standalone',
         orientation: 'portrait',

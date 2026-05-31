@@ -170,7 +170,7 @@ export async function generateAnatelReport(
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;border-bottom:2px solid ${COLORS.accent};padding-bottom:14px;">
       <div>
-        <div style="font-family:${FONT};font-weight:700;font-size:24px;letter-spacing:-0.03em;color:${COLORS.accent};">linka</div>
+        <div style="font-family:${FONT};font-weight:700;font-size:24px;letter-spacing:-0.03em;color:${COLORS.accent};">Veloo</div>
         <div style="font-size:10px;color:${COLORS.muted};margin-top:2px;">SpeedTest — relatório de desempenho</div>
       </div>
       <div style="text-align:right;font-size:10px;color:${COLORS.muted};line-height:1.5;">
@@ -275,7 +275,7 @@ export async function generateAnatelReport(
         explicitamente os artigos da Resolução 717/2019 sobre velocidade mínima de entrega.
       </p>
       <p style="margin:0;">
-        Medições realizadas via Cloudflare Speed Test pelo aplicativo linka SpeedTest.
+        Medições realizadas via Cloudflare Speed Test pelo aplicativo Veloo.
         Não substitui a aferição oficial via EAQ (Entidade Aferidora da Qualidade) da Anatel —
         serve como prova circunstancial robusta na análise da reclamação.
       </p>
@@ -308,7 +308,7 @@ export async function generateAnatelReport(
       }
     }
 
-    pdf.save(`linka-anatel-${formatDateIsoLike(generatedAt)}.pdf`);
+    pdf.save(`veloo-anatel-${formatDateIsoLike(generatedAt)}.pdf`);
   } finally {
     node.remove();
   }

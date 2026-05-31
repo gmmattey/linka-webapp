@@ -60,6 +60,7 @@ interface Props {
   hideIpOnShare?: boolean;
   gamingProfile?: GamingProfile;
   connectionType?: ConnectionType | null;
+  onShowDiagnostico?: () => void;
 }
 
 type ShareStatus = 'idle' | 'copied';
@@ -312,6 +313,7 @@ export function ResultScreen({
   onRetry, onBack,
   unit = 'mbps',
   connectionType,
+  onShowDiagnostico,
 }: Props) {
   void theme;
   void onToggleTheme;
@@ -401,7 +403,7 @@ export function ResultScreen({
 
   const buildQuickShareText = useCallback(() => {
     const lines = [
-      'Resultado LINKA SpeedTest',
+      'Resultado Veloo',
       `Download: ${formatMbps(result.dl)} Mbps`,
       `Upload: ${result.ulFailed ? 'parcial/indisponível' : `${formatMbps(result.ul)} Mbps`}`,
       `Latência: ${formatMs(result.latency)} ms`,
@@ -438,9 +440,9 @@ export function ResultScreen({
         headline: shareCardHeadline,
         isp: shareCardIsp,
       });
-      const file = new File([blob], 'linka-speedtest.png', { type: 'image/png' });
+      const file = new File([blob], 'veloo-speedtest.png', { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'linka SpeedTest' });
+        await navigator.share({ files: [file], title: 'Veloo' });
       } else {
         const text = includeContextInShare
           ? buildShareText(result, interpreted.primary, unit)
@@ -462,14 +464,14 @@ export function ResultScreen({
         headline: shareCardHeadline,
         isp: shareCardIsp,
       });
-      const file = new File([blob], 'linka-speedtest.png', { type: 'image/png' });
+      const file = new File([blob], 'veloo-speedtest.png', { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'linka SpeedTest' });
+        await navigator.share({ files: [file], title: 'Veloo' });
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'linka-speedtest.png';
+        a.download = 'veloo-speedtest.png';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -494,7 +496,7 @@ export function ResultScreen({
   const handleDownloadSupportSummary = useCallback(() => {
     const when = new Date(result.timestamp).toLocaleString('pt-BR');
     const summary = [
-      'LINKA SpeedTest - Evidência resumida para suporte',
+      'Veloo - Evidência resumida para suporte',
       '',
       `Data/hora: ${when}`,
       `Download: ${formatMbps(result.dl)} Mbps`,
@@ -507,13 +509,13 @@ export function ResultScreen({
       'Observação: evidência circunstancial de medição no dispositivo do usuário.',
       'Não constitui laudo técnico oficial.',
     ].join('\n');
-    downloadEvidenceFile(`linka-evidencia-resumo-${result.timestamp}.txt`, summary, 'text/plain;charset=utf-8');
+    downloadEvidenceFile(`veloo-evidencia-resumo-${result.timestamp}.txt`, summary, 'text/plain;charset=utf-8');
   }, [downloadEvidenceFile, result, server?.name]);
 
   const handleDownloadTechnicalRecord = useCallback(() => {
     const payload = {
       generatedAt: new Date().toISOString(),
-      source: 'Linka WebApp PWA',
+      source: 'Veloo Web PWA',
       disclaimer: 'Evidência circunstancial. Não constitui laudo técnico oficial.',
       result: {
         timestamp: result.timestamp,
@@ -536,7 +538,7 @@ export function ResultScreen({
           },
     };
     downloadEvidenceFile(
-      `linka-evidencia-tecnica-${result.timestamp}.json`,
+      `veloo-evidencia-tecnica-${result.timestamp}.json`,
       JSON.stringify(payload, null, 2),
       'application/json;charset=utf-8',
     );
@@ -550,14 +552,14 @@ export function ResultScreen({
       ? `${connectionTypeLabel(connectionType)} · ${server?.name ?? 'Servidor não identificado'}`
       : `${connectionTypeLabel(connectionType)} · dados sensíveis ocultos`;
     popup.document.write(`
-      <html><head><title>Evidencia Linka</title>
+      <html><head><title>Evid�ncia Veloo</title>
       <style>
         body{font-family:Arial,sans-serif;padding:24px;color:#111}
         h1{font-size:20px;margin:0 0 4px}.muted{color:#555;font-size:12px}
         .card{border:1px solid #ddd;border-radius:10px;padding:12px;margin-top:10px}
         .row{margin:4px 0}
       </style></head><body>
-      <h1>Pacote de evidência Linka</h1>
+      <h1>Pacote de evidência Veloo</h1>
       <p class="muted">Evidência circunstancial, não é laudo técnico oficial.</p>
       <div class="card">
         <div class="row"><strong>Data/hora:</strong> ${when}</div>
@@ -1069,7 +1071,7 @@ export function ResultScreen({
         })()}
 
         {/* Contexto Wi-Fi via Atalho iOS (2026-05): exibe quando o teste
-            foi precedido pelo Atalho linka WiFi Context. Fica entre o
+            foi precedido pelo Atalho Veloo WiFi Context. Fica entre o
             bloco de diagnóstico e a seção "Mais detalhes". */}
         {result.wifiContext && (
           <WifiContextCard ctx={result.wifiContext} />
@@ -1109,6 +1111,14 @@ export function ResultScreen({
                 showChevron: true,
                 onClick: () => setActiveSheet('dns'),
               },
+              ...(onShowDiagnostico ? [{
+                icon: <Icon name="shield" size={14} color="var(--accent)" />,
+                iconBg: 'var(--accent-tint)',
+                title: 'Diagnóstico com IA',
+                subtitle: 'Análise detalhada por inteligência artificial',
+                showChevron: true,
+                onClick: onShowDiagnostico,
+              }] : []),
             ]}
           />
         </section>
@@ -1210,6 +1220,7 @@ export function ResultScreen({
 //   - Modo Gamer → src/features/result-detail/GamerSheet.tsx
 //   - DNS        → src/features/dns/DNSGuideSheet.tsx (já existia)
 // =============================================================================
+
 
 
 

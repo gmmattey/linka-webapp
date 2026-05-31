@@ -114,7 +114,7 @@ export function FibraScreen({ onBack }: Props) {
               <FibraMetric label="Serial ONU" value="—" locked />
             </div>
             <AndroidCta>
-              Potência óptica, temperatura do laser e serial ONU disponíveis no <strong>app linka para Android</strong>.
+              Potência óptica, temperatura do laser e serial ONU disponíveis no <strong>app Veloo para Android</strong>.
             </AndroidCta>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function FibraScreen({ onBack }: Props) {
               <FibraRow label="VLAN / PPPoE" value="—" locked />
             </dl>
             <AndroidCta>
-              IP público, uptime, VLAN, concentrador PPPoE e DNS disponíveis no <strong>app linka para Android</strong>.
+              IP público, uptime, VLAN, concentrador PPPoE e DNS disponíveis no <strong>app Veloo para Android</strong>.
             </AndroidCta>
           </div>
         </div>
@@ -159,14 +159,14 @@ export function FibraScreen({ onBack }: Props) {
               <FibraRow label="Número de série" value="—" locked />
             </dl>
             <AndroidCta>
-              Temperatura, alimentação, firmware e dados de hardware do modem disponíveis no <strong>app linka para Android</strong>.
+              Temperatura, alimentação, firmware e dados de hardware do modem disponíveis no <strong>app Veloo para Android</strong>.
             </AndroidCta>
           </div>
         </div>
 
         {/* ── GPON info ────────────────────────────────────────────── */}
         <div className="lk-fibra__gpon-info">
-          <p className="lk-fibra__gpon-title">O que o linka analisa na fibra</p>
+          <p className="lk-fibra__gpon-title">O que o Veloo analisa na fibra</p>
           <p className="lk-fibra__gpon-desc">
             Em conexões de fibra óptica (GPON/XGS-PON), o app Android acessa o modem diretamente via rede local para ler a potência óptica recebida (RX). Um RX abaixo de −27 dBm indica degradação do sinal e pode causar instabilidade mesmo com velocidade contratada normal.
           </p>

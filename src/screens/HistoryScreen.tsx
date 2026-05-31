@@ -163,7 +163,7 @@ function SpeedChart({ records, unit }: { records: TestRecord[]; unit: 'mbps' | '
 
       <div style={{ display: 'flex', gap: 12, marginTop: 6 }}>
         <LegendDot color="var(--accent)" label="Download" />
-        <LegendDot color="var(--error)" label="Upload" dashed />
+        <LegendDot color="var(--ul)" label="Upload" dashed />
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
@@ -259,7 +259,7 @@ function RecordList({ records, unit }: { records: TestRecord[]; unit: 'mbps' | '
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
             <Metric label="Download" value={`${(r.dl / divisor).toFixed(r.dl / divisor < 10 ? 1 : 0)}`} unit={unitLabel} color="var(--accent)" />
-            <Metric label="Upload" value={`${(r.ul / divisor).toFixed(r.ul / divisor < 10 ? 1 : 0)}`} unit={unitLabel} color="var(--error)" />
+            <Metric label="Upload" value={`${(r.ul / divisor).toFixed(r.ul / divisor < 10 ? 1 : 0)}`} unit={unitLabel} color="var(--ul)" />
             <Metric label="Ping" value={`${Math.round(r.latency)}`} unit="ms" color="var(--text-2)" />
           </div>
         </div>
